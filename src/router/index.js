@@ -1,0 +1,174 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+const login = r => require.ensure([], () => r(require('@/page/login')), 'login');
+const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manage');
+const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
+
+const userList = r => require.ensure([], () => r(require('@/page/userList')), 'userList');
+const userListNEW = r => require.ensure([], () => r(require('@/page/userListNEW')), 'userListNEW');
+const adminList = r => require.ensure([], () => r(require('@/page/adminList')), 'adminList');
+const adminListNEW = r => require.ensure([], () => r(require('@/page/adminListNEW')), 'adminListNEW');
+const shopList = r => require.ensure([], () => r(require('@/page/shopList')), 'shopList');
+const foodList = r => require.ensure([], () => r(require('@/page/foodList')), 'foodList');
+const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
+const videoList = r => require.ensure([], () => r(require('@/page/videoList')), 'videoList');
+const messageList = r => require.ensure([], () => r(require('@/page/messageList')), 'messageList');
+
+// const addShop = r => require.ensure([], () => r(require('@/page/addShop')), 'addShop');
+// const addGoods = r => require.ensure([], () => r(require('@/page/addGoods')), 'addGoods');
+// const addUser = r => require.ensure([], () => r(require('@/page/addUser')), 'addUser');
+// const addAdmin = r => require.ensure([], () => r(require('@/page/addAdmin')), 'addAdmin');
+// const addVideo = r => require.ensure([], () => r(require('@/page/addVideo')), 'addVideo');
+
+const userData = r => require.ensure([], () => r(require('@/page/userData')), 'userData');
+const adminData = r => require.ensure([], () => r(require('@/page/adminData')), 'adminData');
+const videoData = r => require.ensure([], () => r(require('@/page/videoData')), 'videoData');
+const uploadImg = r => require.ensure([], () => r(require('@/page/uploadImg')), 'uploadImg');
+const vueEdit = r => require.ensure([], () => r(require('@/page/vueEdit')), 'vueEdit');
+const adminSet = r => require.ensure([], () => r(require('@/page/adminSet')), 'adminSet');
+// const adminPer = r => require.ensure([], () => r(require('@/page/adminPer')), 'adminPer');
+const sendMessage = r => require.ensure([], () => r(require('@/page/sendMessage')), 'sendMessage');
+const explain = r => require.ensure([], () => r(require('@/page/explain')), 'explain');
+const userMonitoring = r => require.ensure([], () => r(require('@/page/userMonitoring')), 'userMonitoring');
+const videoMonitoring = r => require.ensure([], () => r(require('@/page/videoMonitoring')), 'videoMonitoring');
+
+const userMonView = r => require.ensure([], () => r(require('@/page/userMonView')), 'userMonView');
+const videoMonView = r => require.ensure([], () => r(require('@/page/videoMonView')), 'videoMonView');
+
+const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
+
+const routes = [
+	{
+		path: '/',
+		component: login
+	},
+	{
+		path: '/test',
+		component: test
+	},
+	{
+		path: '/manage',
+		component: manage,
+		name: '',
+		children: [{
+			path: '',
+			component: home,
+			meta: [],
+		},
+		// {
+		// 	path: '/addShop',
+		// 	component: addShop,
+		// 	meta: ['添加数据', '添加商铺'],
+		// },{
+		// 	path: '/addGoods',
+		// 	component: addGoods,
+		// 	meta: ['添加数据', '添加商品'],
+		// },{
+		// 	path: '/addUser',
+		// 	component: addUser,
+		// 	meta: ['添加数据', '添加用户'],
+		// },{
+		// 	path: '/addAdmin',
+		// 	component: addAdmin,
+		// 	meta: ['添加数据', '添加管理员'],
+		// },{
+		// 	path: '/addVideo',
+		// 	component: addVideo,
+		// 	meta: ['添加数据', '添加视频'],
+		// },
+		{
+			path: '/userList',
+			component: userList,
+			meta: ['数据管理', '用户列表'],
+		},{
+			path: '/userListNEW',
+			component: userListNEW,
+			meta: ['数据管理', '用户列表(新)'],
+		},{
+			path: '/shopList',
+			component: shopList,
+			meta: ['数据管理', '商家列表'],
+		},{
+			path: '/foodList',
+			component: foodList,
+			meta: ['数据管理', '食品列表'],
+		},{
+			path: '/orderList',
+			component: orderList,
+			meta: ['数据管理', '订单列表'],
+		},{
+			path: '/adminList',
+			component: adminList,
+			meta: ['数据管理', '管理员列表'],
+		},{
+			path: '/adminListNEW',
+			component: adminListNEW,
+			meta: ['数据管理', '管理员列表(新)'],
+		},{
+			path: '/videoList',
+			component: videoList,
+			meta: ['数据管理', '视频列表'],
+		},{
+			path: '/messageList',
+			component: messageList,
+			meta: ['数据管理', '通知列表'],
+		},{
+			path: '/userData',
+			component: userData,
+			meta: ['数据统计', '用户数据'],
+		},{
+			path: '/adminData',
+			component: adminData,
+			meta: ['数据统计', '管理员数据'],
+		},{
+			path: '/videoData',
+			component: videoData,
+			meta: ['数据统计', '视频数据'],
+		},{
+			path: '/userMonitoring',
+			component: userMonitoring,
+			meta: ['实时监控', '用户监控'],
+		},{
+			path: '/userMonitoring/userMonView',
+			component: userMonView,
+			meta: ['实时监控', '用户监控', '用户监控视图'],
+		},{
+			path: '/videoMonitoring',
+			component: videoMonitoring,
+			meta: ['实时监控', '视频监控'],
+		},{
+			path: '/videoMonitoring/videoMonView',
+			component: videoMonView,
+			meta: ['实时监控', '视频监控','视频监控视图'],
+		},{
+			path: '/uploadImg',
+			component: uploadImg,
+			meta: ['文本编辑', 'MarkDown'],
+		},{
+			path: '/vueEdit',
+			component: vueEdit,
+			meta: ['编辑', '文本编辑'],
+		},{
+			path: '/adminSet',
+			component: adminSet,
+			meta: ['设置', '个人信息'],
+		},{
+			path: '/sendMessage',
+			component: sendMessage,
+			meta: ['设置', '我的权限'],
+		},{
+			path: '/explain',
+			component: explain,
+			meta: ['说明', '说明'],
+		}]
+	}
+]
+
+export default new Router({
+	routes,
+	strict: process.env.NODE_ENV !== 'production',
+	mode: 'history',//去掉#号
+})
