@@ -33,7 +33,7 @@
                     <template slot-scope="props">
                         <el-form label-position="left" inline class="demo-table-expand">
                             <el-form-item label="用户名">
-                                <span>{{ props.row.user_name }}</span>
+                                <span>{{ props.row.name }}</span>
                             </el-form-item>
                             <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
@@ -51,13 +51,13 @@
                                 <span>{{ props.row.creat_time }}</span>
                             </el-form-item>
                             <el-form-item label="出生日期">
-                                <span>{{ props.row.date }}</span>
+                                <span>{{ props.row.birth }}</span>
                             </el-form-item>
                             <el-form-item label="性别">
                                 <span>{{ props.row.sex }}</span>
                             </el-form-item>
                             <el-form-item label="个性签名">
-                                <span>{{ props.row.desc }}</span>
+                                <span>{{ props.row.personal_signature }}</span>
                             </el-form-item>
                         </el-form>
                     </template>
@@ -69,7 +69,7 @@
                 </el-table-column>
                 <el-table-column
                     label="用户名称"
-                    prop="user_name"
+                    prop="name"
                     width="200">
                 </el-table-column>
                 <el-table-column
@@ -79,7 +79,7 @@
                 </el-table-column>
                 <el-table-column
                   label="个性签名"
-                  prop="desc">
+                  prop="personal_signature">
                 </el-table-column>
                 <el-table-column label="操作">
                   <template slot-scope="scope">
@@ -173,21 +173,21 @@
             <!-- 弹窗添加用户开始 -->  
             <!-- :before-close="handleClose"    关闭按钮回调  -->
             <el-dialog title="添加用户" :visible.sync="dialogFormVisible_adduser" :show-close="false">
-                <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form :model="formData" status-icon :rules="rules" ref="formData" label-width="80px" class="demo-ruleForm">
                     <el-form-item label="用户名" prop="name">
-                        <el-input v-model="ruleForm.name"></el-input>
+                        <el-input v-model="formData.name"></el-input>
                     </el-form-item> 
                     <el-form-item label="邮箱" prop="email">
-                        <el-input v-model="ruleForm.email"></el-input>
+                        <el-input v-model="formData.email"></el-input>
                     </el-form-item>
                     <el-form-item label="联系方式" prop="phone">
-                        <el-input v-model.number="ruleForm.phone" :maxlength="11"></el-input>
+                        <el-input v-model.number="formData.phone" :maxlength="11"></el-input>
                     </el-form-item>
                     <el-form-item label="密码" prop="pass">
-                        <el-input type="password" v-model="ruleForm.pass" auto-complete="off"></el-input>
+                        <el-input type="password" v-model="formData.pass" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="确认密码" prop="checkPass">
-                        <el-input type="password" v-model="ruleForm.checkPass" auto-complete="off"></el-input>
+                        <el-input type="password" v-model="formData.checkPass" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="上传头像">
                         <!-- action="https://jsonplaceholder.typicode.com/posts/"  路径 -->
@@ -202,7 +202,7 @@
                         </el-upload>  
                     </el-form-item>
                     <el-form-item label="性别">
-                        <el-radio-group v-model="ruleForm.radio">
+                        <el-radio-group v-model="formData.radio">
                             <el-radio :label="3">男</el-radio>
                             <el-radio :label="6">女</el-radio>
                             <el-radio :label="9">保密</el-radio>
@@ -215,15 +215,12 @@
                             placeholder="选择日期">
                         </el-date-picker>
                     </el-form-item>
-                    <!-- <el-form-item label="年龄" prop="age">
-                        <el-input v-model.number="ruleForm2.age"></el-input>
-                    </el-form-item> -->
-
+                   
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button @click="cancelAddUser('ruleForm')">取 消</el-button>
-                        <el-button type="primary" @click="submitAddUser('ruleForm')">确 定</el-button>
+                        <el-button @click="resetForm('formData')">重置</el-button>
+                        <el-button @click="cancelAddUser('formData')">取 消</el-button>
+                        <el-button type="primary" @click="submitAddUser('formData')">确 定</el-button>
                     </div>
             </el-dialog> 
             <!-- 弹窗添加用户结束 -->
@@ -234,7 +231,6 @@
 
 <script>
     import headTop from '../components/headTop'
-    
     import {baseUrl, baseImgPath} from '@/config/env'
     // import {getFoods, getFoodsCount, getMenu, updateFood, deleteFood, getResturantDetail, getMenuById} from '@/api/getData'
     export default {
@@ -283,38 +279,8 @@
 
                 // 查询
                 search_user: '',
-
-                tableData: [{
-                    user_name: '好滋好味',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '123',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'
-                    },{
-                    user_name: '好滋好味鸡蛋',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '456',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'
-                    },{
-                    user_name: '好滋好味鸡蛋仔',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '789',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'   
-                }],
+                tableData: [],
+          
 
                 // 分页
                 currentRow: null,
@@ -340,7 +306,7 @@
 
 
                 // 新增用户信息
-                ruleForm: {
+                formData: {
                     name: '',
                     email: '',
                     phone: '',
@@ -350,29 +316,29 @@
                     age: '',
                 },
                 rules: {
-                    name: [
-                        { required: true, message: '请输入用户名', trigger: 'blur' },
-                        { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-                    ],
-                    email:[
-                        { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-                        { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
-                    ],
-                    phone:[
-                        // { required: true, message: '请输入正确的手机号码', trigger: 'blur' },
-                        // { type: 'number', message: '电话号码必须是数字'}
-                        { required: true, message: '请输入联系电话'},
-						{ type: 'number', message: '电话号码必须是数字' }
-                    ],
-                    pass: [
-                        { required: true, validator: validatePass, trigger: 'blur' }
-                    ],
-                    checkPass: [
-                        { required: true, validator: validatePass2, trigger: 'blur' }
-                    ],
-                    age: [
-                        { validator: checkAge, trigger: 'blur' }
-                    ]
+                    // name: [
+                    //     { required: true, message: '请输入用户名', trigger: 'blur' },
+                    //     { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+                    // ],
+                    // email:[
+                    //     { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+                    //     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+                    // ],
+                    // phone:[
+                    //     // { required: true, message: '请输入正确的手机号码', trigger: 'blur' },
+                    //     // { type: 'number', message: '电话号码必须是数字'}
+                    //     { required: true, message: '请输入联系电话'},
+					// 	{ type: 'number', message: '电话号码必须是数字' }
+                    // ],
+                    // pass: [
+                    //     { required: true, validator: validatePass, trigger: 'blur' }
+                    // ],
+                    // checkPass: [
+                    //     { required: true, validator: validatePass2, trigger: 'blur' }
+                    // ],
+                    // age: [
+                    //     { validator: checkAge, trigger: 'blur' }
+                    // ]
                 },
 
                  //日期
@@ -391,86 +357,46 @@
                 selectIndex: null,
             }
         },
-        // created(){
-        // 	this.restaurant_id = this.$route.query.restaurant_id;
-        //     // this.initData();
-        // },
+        created(){
+            this.initData();   	
+        },
         computed: {
             // ...mapState(['adminInfo']),
-        	// specs: function (){
-        	// 	let specs = [];
-        	// 	if (this.selectTable.specfoods) {
-	        // 		this.selectTable.specfoods.forEach(item => {
-	        // 			specs.push({
-	        // 				specs: item.specs_name,
-	        // 				packing_fee: item.packing_fee,
-	        // 				price: item.price,
-	        // 			})
-	        // 		})
-        	// 	}
-        	// 	return specs
-        	// }
         },
     	components: {
     		headTop,
     	},
         methods: {
-            // async initData(){
-            //     try{
-            //         const countData = await getFoodsCount({restaurant_id: this.restaurant_id});
-            //         if (countData.status == 1) {
-            //             this.count = countData.count;
-            //         }else{
-            //             throw new Error('获取数据失败');
-            //         }
-            //         this.getFoods();
-            //     }catch(err){
-            //         console.log('获取数据失败', err);
-            //     }
-            // },
-            // async getMenu(){
-            // 	this.menuOptions = [];
-            //     try{
-            //         const menu = await getMenu({restaurant_id: this.selectTable.restaurant_id, allMenu: true});
-            //         menu.forEach((item, index) => {
-            //             this.menuOptions.push({
-            //             	label: item.name,
-            //             	value: item.id,
-            //             	index,
-            //             })
-            //         })
-            //     }catch(err){
-            //         console.log('获取食品种类失败', err);
-            //     }
-            // },
-            // async getFoods(){
-            //     const Foods = await getFoods({offset: this.offset, limit: this.limit, restaurant_id: this.restaurant_id});
-            //     this.tableData = [];
-            //     Foods.forEach((item, index) => {
-            //         const tableData = {};
-            //         tableData.name = item.name;
-            //         tableData.item_id = item.item_id;
-            //         tableData.description = item.description;
-            //         tableData.rating = item.rating;
-            //         tableData.month_sales = item.month_sales;
-            //         tableData.restaurant_id = item.restaurant_id;
-            //         tableData.category_id = item.category_id;
-            //         tableData.image_path = item.image_path;
-            //         tableData.specfoods = item.specfoods;
-            //         tableData.index = index;
-            //         this.tableData.push(tableData);
-            //     })
-            // },
-            
-            // tableRowClassName(row, index) {
-		    //     if (index === 1) {
-		    //     	return 'info-row';
-		    //     } else if (index === 3) {
-		    //     	return 'positive-row';
-		    //     }
-		    //     return '';
-            // },
-            
+            //初始化数据
+            initData(){
+                this.axios.get('http://localhost:8004/api/user/usersInfo')
+                .then(res => {
+                    // console.log(res);
+                    if(res.status == 200){
+                        this.tableData = [];
+                        // console.log(res.data);
+                        res.data.forEach(item =>{
+                            const tableItem = {
+                                user_id: item.user_id,
+                                name: item.name,
+                                phone: item.phone,
+                                email: item.email,
+                                creat_time: item.creat_time,
+                                birth: item.birth,
+                                sex: item.sex,
+                                personal_signature: item.personal_signature,
+                            }
+                            this.tableData.push(tableItem)
+                        })
+                    }else{
+                        console.log('错误');
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+
+            },
             
             // 分页
             handleSizeChange(val) {
@@ -495,10 +421,12 @@
             // 编辑
             handleEdit(index, row) {
                 console.log("编辑");
-                // console.log(index, row);
+                console.log(index, row);
             	// this.getSelectItemData(row, 'edit')
                 // this.getSelectItemUserData(row, 'edit');
                 this.dialogFormVisible = true;
+                // this.getSelectItemUserData(row, 'edit');
+
             },
 
             getSelectItemUserData(row, type){
@@ -514,15 +442,18 @@
             },
             // 删除
             handleDelete(index, row){
-                console.log(index, row);
+                // console.log(index, row);
                 this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                     }).then(() => {
+                        console.log(row.user_id)
+                        this.initData();   	
                     this.$message({
                         type: 'success',
-                        message: '删除成功!'
+                        message: '删除成功!',
+                        
                     });
                     }).catch(() => {
                     this.$message({
@@ -638,8 +569,8 @@
                     if (valid) {
                         console.log(formName);
                         this.resetForm(formName);
-                        this.dialogFormVisible_adduser = false;
                         console.log("提交成功");
+                        this.dialogFormVisible_adduser = false;
                         // alert('submit!');           
                     } else {
                         console.log('error submit!!');

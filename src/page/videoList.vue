@@ -33,7 +33,7 @@
                     <template slot-scope="props">
                         <el-form label-position="left" inline class="demo-table-expand">
                             <el-form-item label="视频名称">
-                                <span>{{ props.row.video_name }}</span>
+                                <span>{{ props.row.name }}</span>
                             </el-form-item>
                             <el-form-item label="视频封面">
                                 <span>{{ props.row.avater }}</span>
@@ -70,7 +70,7 @@
                 </el-table-column>
                 <el-table-column
                     label="视频名称"
-                    prop="video_name"
+                    prop="name"
                     width="200">
                 </el-table-column>
                 <el-table-column
@@ -280,28 +280,28 @@
 
                 // 查询
                 search_user: '',
-
-                tableData: [{
-                    video_name: '好滋好味',
-                    cover: '头像位置',
-                    category: '动漫',
-                    video_id: '123',
-                    creat_time: '2016-09-01',
-                    modify_time: '2000-01-01',
-                    tag: '要改',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名',
-                    link: 'https.......'
-                    }, {
-                    video_name: '好滋',
-                    cover: '头像位置',
-                    category: '动漫',
-                    video_id: '456',
-                    creat_time: '2016-09-01',
-                    modify_time: '2000-01-01',
-                    tag: '搞笑',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名',
-                    link: 'https.......'
-                }],
+                tableData: [],
+                // tableData: [{
+                //     video_name: '好滋好味',
+                //     cover: '头像位置',
+                //     category: '动漫',
+                //     video_id: '123',
+                //     creat_time: '2016-09-01',
+                //     modify_time: '2000-01-01',
+                //     tag: '要改',
+                //     desc: '呵呵呵呵呵呵额呵呵这是个性签名',
+                //     link: 'https.......'
+                //     }, {
+                //     video_name: '好滋',
+                //     cover: '头像位置',
+                //     category: '动漫',
+                //     video_id: '456',
+                //     creat_time: '2016-09-01',
+                //     modify_time: '2000-01-01',
+                //     tag: '搞笑',
+                //     desc: '呵呵呵呵呵呵额呵呵这是个性签名',
+                //     link: 'https.......'
+                // }],
 
                 // 分页
                 currentRow: null,
@@ -383,13 +383,42 @@
                 selectIndex: null,
             }
         },
+        created(){
+            this.initData();
+        },
         computed: {
             // ...mapState(['adminInfo']),
         },
     	components: {
     		headTop,
     	},
-        methods: {      
+        methods: {    
+            initData(){
+                this.axios.get('http://localhost:8004/api/video/videoInfo')
+                .then(res => {
+                    console.log(res);
+                    if(res.status == 200){
+                        const tableData = [];
+                        res.data.forEach(item => {
+                            const tableItem = {
+                                video_id: item.video_id,
+                                name: item.name,
+                                cover: item.cover,
+                                creat_time: item.creat_time,
+                                modify_time: item.modify_time,
+                                category: item.category,
+                                tag: item.tag,
+                                desc: item.desc,
+                                link: item.link,
+                            }
+                            this.tableData.push(tableItem);
+                        });
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+            },  
             // 分页
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);

@@ -1,4 +1,5 @@
 import fetch from '@/config/fetch'
+// import axios from '@/config/axios'
 
 /**
  * 登陆
@@ -226,3 +227,15 @@ export const getAddressById = address_id => fetch('/v1/addresse/' + address_id);
  */
 
 export const getUserCity = () => fetch('/v1/user/city/count');
+
+
+
+/**
+ * 获取信息测试
+ */
+
+
+// this.axios.get('http://localhost:8004/api/videoInfo').then(res => {this.data = res;})
+
+// export const getVideoInfo = () => fetch('http://localhost:8004/api/videoInfo');
+export const getVideoInfo = () => this.axios.get('http://localhost:8004/api/videoInfo').then(res => {return res})

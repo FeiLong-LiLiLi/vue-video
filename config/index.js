@@ -1,3 +1,4 @@
+'use strict'
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 
@@ -23,11 +24,22 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
+    host: '127.0.0.1',
     port: 8003,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    // proxyTable: {},
+    proxyTable: {
+      '/api/videoInfo': {
+          target: 'http://localhost:8004',//目标接口域名
+          changeOrigin: true,//是否跨域
+          pathRewrite: {
+            '^/api': '/api/videoInfo'//重写接口,后面可以使重写的新路径，一般不做更改
+           }
+      }
+    },
+    
     context: [ //代理路径
         '/shopping',
         '/ugc',
@@ -44,6 +56,7 @@ module.exports = {
         '/statis',
         '/img',
     ],
+
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

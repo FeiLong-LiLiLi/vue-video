@@ -33,13 +33,13 @@
                     <template slot-scope="props">
                         <el-form label-position="left" inline class="demo-table-expand">
                             <el-form-item label="管理员名">
-                                <span>{{ props.row.user_name }}</span>
+                                <span>{{ props.row.name }}</span>
                             </el-form-item>
                             <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
                             </el-form-item>
                             <el-form-item label="管理员 ID">
-                                <span>{{ props.row.user_id }}</span>
+                                <span>{{ props.row.admin_id }}</span>
                             </el-form-item>
                             <el-form-item label="联系方式">
                                 <span>{{ props.row.phone }}</span>
@@ -51,13 +51,13 @@
                                 <span>{{ props.row.creat_time }}</span>
                             </el-form-item>
                             <el-form-item label="出生日期">
-                                <span>{{ props.row.date }}</span>
+                                <span>{{ props.row.birth }}</span>
                             </el-form-item>
                             <el-form-item label="性别">
                                 <span>{{ props.row.sex }}</span>
                             </el-form-item>
                             <el-form-item label="个性签名">
-                                <span>{{ props.row.desc }}</span>
+                                <span>{{ props.row.personal_signature }}</span>
                             </el-form-item>
                         </el-form>
                     </template>
@@ -69,17 +69,17 @@
                 </el-table-column>
                 <el-table-column
                     label="管理员名"
-                    prop="user_name"
+                    prop="name"
                     width="200">
                 </el-table-column>
                 <el-table-column
                     label="管理员 ID"
-                    prop="user_id"
+                    prop="admin_id"
                     width="200">
                 </el-table-column>
                 <el-table-column
                   label="个性签名"
-                  prop="desc">
+                  prop="personal_signature">
                 </el-table-column>
                 <el-table-column label="操作">
                   <template slot-scope="scope">
@@ -295,16 +295,6 @@
                     date: '2000-01-01',
                     desc: '呵呵呵呵呵呵额呵呵这是个性签名'
                     },{
-                    user_name: '好滋好味鸡蛋',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '456',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'
-                    },{
                     user_name: '好滋好味鸡蛋仔',
                     avater: '头像位置',
                     sex: '男',
@@ -391,10 +381,10 @@
                 selectIndex: null,
             }
         },
-        // created(){
-        // 	this.restaurant_id = this.$route.query.restaurant_id;
-        //     // this.initData();
-        // },
+        created(){
+        	// this.restaurant_id = this.$route.query.restaurant_id;
+            this.initData();
+        },
         computed: {
             // ...mapState(['adminInfo']),
         	// specs: function (){
@@ -415,19 +405,30 @@
     		headTop,
     	},
         methods: {
-            // async initData(){
-            //     try{
-            //         const countData = await getFoodsCount({restaurant_id: this.restaurant_id});
-            //         if (countData.status == 1) {
-            //             this.count = countData.count;
-            //         }else{
-            //             throw new Error('获取数据失败');
-            //         }
-            //         this.getFoods();
-            //     }catch(err){
-            //         console.log('获取数据失败', err);
-            //     }
-            // },
+             initData(){
+                this.axios.get('http://localhost:8004/api/admin/adminInfo')
+                .then(res => {
+                //    console.log(res); 
+                   if(res.status == 200){
+                       this.tableData = [];
+                       res.data.forEach(item => {
+                           const tableItem = {
+                                admin_id: item.admin_id,
+                                name: item.name,
+                                phone: item.phone,
+                                email: item.email,
+                                creat_time:item.creat_time,
+                                birth: item.birth,
+                                personal_signature: item.personal_signature,
+                           }
+                           this.tableData.push(tableItem);
+                       });
+                    }
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+            },
             // async getMenu(){
             // 	this.menuOptions = [];
             //     try{
@@ -478,7 +479,7 @@
             },
             handleCurrentChange(val) {
                 this.currentPage = val;
-                this.offset = (val - 1)*this.limit;
+                this.offset = (val - 1)*this.limit;s
                 // this.getFoods()
             },
 
