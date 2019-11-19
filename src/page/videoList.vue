@@ -7,15 +7,15 @@
                 <el-input
                     placeholder="请输入内容"
                     prefix-icon="el-icon-search"
-                    v-model="search_user">
+                    v-model="query_video">
                 </el-input>
                 </div>
                 <!-- 查询视频按钮 -->
-                <el-button type="primary">查询</el-button>
+                <el-button type="primary" @click="queryVideo(query_video)">查询</el-button>
                 <!-- 增加视频按钮 -->
                 <div class="add-button">
                 <!-- <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button> -->
-                <el-button type="primary" @click="addUserInfo">添加视频</el-button>
+                <el-button type="primary" @click="addVideo">添加视频</el-button>
                 </div>
             </div>
     
@@ -26,9 +26,6 @@
                 :expand-row-keys='expendRow'
                 :row-key="row => row.index"
                 style="width: 100%">
-            <!-- <el-table
-                :data="tableData"
-                style="width: 100%"> -->
                 <el-table-column type="expand">
                     <template slot-scope="props">
                         <el-form label-position="left" inline class="demo-table-expand">
@@ -112,10 +109,9 @@
             <!-- 弹窗修改视频信息开始 -->
             <el-dialog title="修改用户信息" :visible.sync="dialogFormVisible" :show-close="false" >
                 <div class="updateUserInfo">
-                    <!-- <template slot-scope="props"> -->
-                        <el-form :model="updataUserInfo">
-                            <el-form-item label="视频名称" label-width="100px" prop="user_name">
-                                <el-input v-model="updataUserInfo.user_name"></el-input>
+                        <el-form :model="selectTable">
+                            <el-form-item label="视频名称" label-width="100px">
+                                <el-input v-model="selectTable.name"></el-input>
                             </el-form-item>
                             <el-form-item label="视频封面" label-width="100px">
                                 <el-upload
@@ -129,9 +125,9 @@
                                 </el-upload>
                             </el-form-item>
                             <el-form-item label="视频类别" label-width="100px">
-                                 <el-select v-model="video_category" clearable filterable placeholder="请选择">
+                                 <el-select v-model="selectTable.category" clearable filterable placeholder="请选择">
                                     <el-option
-                                    v-for="item in choose_video_category"
+                                    v-for="item in choose_category"
                                     :key="item.value"
                                     :label="item.label"
                                     :value="item.value">
@@ -140,14 +136,14 @@
                             </el-form-item>
                             <el-form-item label="标签" label-width="100px">
                                 <el-select
-                                    v-model="video_tag"
+                                    v-model="selectTable.tag"
                                     multiple
                                     filterable
                                     allow-create
                                     default-first-option
                                     placeholder="请选择视频标签">
                                     <el-option
-                                        v-for="item in choose_video_tag"
+                                        v-for="item in choose_tag"
                                         :key="item.value"
                                         :label="item.label"
                                         :value="item.value">
@@ -159,14 +155,14 @@
                                         type="textarea"
                                         :rows="3"
                                         placeholder="请输入内容"
-                                        v-model="updataUserInfo.desc">
+                                        v-model="selectTable.desc">
                                 </el-input>
                             </el-form-item>
                         </el-form>
                     <!-- </template> -->
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="dialogFormVisible = false">取 消</el-button>
-                        <el-button type="primary" @click="updateUserInfo">确 定</el-button>
+                        <el-button type="primary" @click="submitUpdate(selectTable)">确 定</el-button>
                         <!-- <el-button type="primary" @click="getInfo">取信息</el-button> -->
                     </div>
                 </div>
@@ -175,7 +171,7 @@
 
             <!-- 弹窗添加视频开始 -->  
             <!-- :before-close="handleClose"    关闭按钮回调  -->
-            <el-dialog title="添加视频" :visible.sync="dialogFormVisible_adduser" :show-close="false">
+            <el-dialog title="添加视频" :visible.sync="dialogFormVisible_addVideo" :show-close="false">
                 <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
                     <el-form-item label="上传视频">
                         <div class="upload-video">
@@ -200,7 +196,10 @@
                             </el-upload>     
                         </div>
                     </el-form-item>
-                    <el-form-item label="视频名称" prop="name">
+                    <el-form-item label="视频 ID">
+                        <el-input v-model="ruleForm.video_id"></el-input>
+                    </el-form-item> 
+                    <el-form-item label="视频名称">
                         <el-input v-model="ruleForm.name"></el-input>
                     </el-form-item> 
                     <el-form-item label="视频封面">
@@ -218,9 +217,9 @@
                         </div>    
                     </el-form-item>
                     <el-form-item label="视频类别">
-                        <el-select v-model="video_category" clearable filterable placeholder="请选择">
+                        <el-select v-model="ruleForm.category" clearable filterable placeholder="请选择">
                             <el-option
-                            v-for="item in choose_video_category"
+                            v-for="item in choose_category"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
@@ -229,14 +228,14 @@
                     </el-form-item>
                     <el-form-item label="标签" label-width="100px">
                         <el-select
-                            v-model="video_tag"
+                            v-model="ruleForm.tag"
                             multiple
                             filterable
                             allow-create
                             default-first-option
                             placeholder="请选择视频标签">
                             <el-option
-                                v-for="item in choose_video_tag"
+                                v-for="item in choose_tag"
                                 :key="item.value"
                                 :label="item.label"
                                 :value="item.value">
@@ -248,14 +247,14 @@
                             type="textarea"
                             :rows="3"
                             placeholder="请输入内容"
-                            v-model="updataUserInfo.desc">
+                            v-model="ruleForm.desc">
                         </el-input>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button @click="cancelAddUser('ruleForm')">取 消</el-button>
-                        <el-button type="primary" @click="submitAddUser('ruleForm')">确 定</el-button>
+                        <el-button @click="resetForm(ruleForm)">重置</el-button>
+                        <el-button @click="cancelAddVideo(ruleForm)">取 消</el-button>
+                        <el-button type="primary" @click="submitAddVideo(ruleForm)">确 定</el-button>
                     </div>
             </el-dialog> 
             <!-- 弹窗添加视频结束 -->
@@ -279,29 +278,9 @@
                 city: {},
 
                 // 查询
-                search_user: '',
+                query_video: '',
                 tableData: [],
-                // tableData: [{
-                //     video_name: '好滋好味',
-                //     cover: '头像位置',
-                //     category: '动漫',
-                //     video_id: '123',
-                //     creat_time: '2016-09-01',
-                //     modify_time: '2000-01-01',
-                //     tag: '要改',
-                //     desc: '呵呵呵呵呵呵额呵呵这是个性签名',
-                //     link: 'https.......'
-                //     }, {
-                //     video_name: '好滋',
-                //     cover: '头像位置',
-                //     category: '动漫',
-                //     video_id: '456',
-                //     creat_time: '2016-09-01',
-                //     modify_time: '2000-01-01',
-                //     tag: '搞笑',
-                //     desc: '呵呵呵呵呵呵额呵呵这是个性签名',
-                //     link: 'https.......'
-                // }],
+                
 
                 // 分页
                 currentRow: null,
@@ -312,23 +291,18 @@
 
                 
                 dialogFormVisible: false,   //编辑页面
-                dialogFormVisible_adduser: false,   //添加用户
+                dialogFormVisible_addVideo: false,   //添加用户
 
-                // 更新用户信息
-                // updataUserInfo: {
-                //     user_name: '用户X',
-                //     phone: 'phone',
-                //     email: '123',
-                //     sex: 9,
-                //     date: '2010-01-01',
-                //     desc: "2334",
-                // },
-                updataUserInfo: {},
-
+                //更新
+                selectTable: {
+                    category: '',
+                    tag: '',
+                },
 
                 // 新增用户信息
                 ruleForm: {
-                    name: '',
+                    category: '',
+                    tag: ''
                 },
                 rules: {
                     name: [
@@ -336,26 +310,24 @@
                         { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
                     ],
                 },
-                
                 //视频类别
-                choose_video_category: [{
-                    value: '选项1',
+                choose_category: [{
+                    value: '综艺',
                     label: '综艺'
                     }, {
-                    value: '选项2',
+                    value: '动漫',
                     label: '动漫'
                 }],
-                video_category: '',
-
+                
                 //视频标签
-                choose_video_tag: [{
+                choose_tag: [{
                     value: 'HTML',
                     label: 'HTML'
                     }, {
                     value: 'JavaScript',
                     label: 'JavaScript'
                     }],
-                video_tag: [],
+
                  //日期
                 pickerOptions1: {
                     disabledDate(time) {
@@ -377,7 +349,7 @@
                 },
 
                 // 无用
-                selectTable: {},
+
                 menuOptions: [],
                 selectMenu: {},
                 selectIndex: null,
@@ -396,7 +368,7 @@
             initData(){
                 this.axios.get('http://localhost:8004/api/video/videoInfo')
                 .then(res => {
-                    console.log(res);
+                    // console.log(res);
                     if(res.status == 200){
                         const tableData = [];
                         res.data.forEach(item => {
@@ -408,7 +380,7 @@
                                 modify_time: item.modify_time,
                                 category: item.category,
                                 tag: item.tag,
-                                desc: item.desc,
+                                desc: item.video_desc,
                                 link: item.link,
                             }
                             this.tableData.push(tableItem);
@@ -441,38 +413,58 @@
             // 编辑
             handleEdit(index, row) {
                 console.log("编辑");
-                // console.log(index, row);
-            	// this.getSelectItemData(row, 'edit')
-                this.getSelectItemUserData(row, 'edit');
+                // // console.log(row);
+                const selectTable = {};
+                selectTable.category = row.category;
+                // // selectTable.cover = row.cover;
+                // // selectTable.creat_time = row.creat_time;
+                selectTable.desc = row.desc;
+                // selectTable.link = row.link;
+                // // selectTable.modify_time = row.modify_time;
+                selectTable.video_id = row.video_id;
+                selectTable.name = row.name;
+                // selectTable.tag = row.tag;
+                // selectTable.tag = [];
+                if(row.tag.length > 0){
+                    selectTable.tag = row.tag.split(';'); 
+                }else{
+                    selectTable.tag = [];
+                }
+                this.selectTable = selectTable;
                 this.dialogFormVisible = true;
             },
-
-            getSelectItemUserData(row, type){
-                console.log("获取的信息");
-                console.log(row);
-                // console.log(row.user_name);
-                const updataUserInfo = {};
-                updataUserInfo.user_name = row.user_name;
-                console.log(updataUserInfo.user_name);
+            
 
 
-            },
             // 删除
             handleDelete(index, row){
-                console.log(index, row);
-                 this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+                console.log(index);
+                console.log(row);
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                     }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                        this.axios.get('http://localhost:8004/api/video/delVideo',{
+                                params: {
+                                    video_id: row.video_id,
+                                }
+                            })
+                            // .then(res => {
+                            //     console.log('删除');
+                            // })
+                            // .catch(e => {
+                                
+                            // });
+                        this.tableData.splice(index,1)
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
                     }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
                     });          
                 });
             },
@@ -498,16 +490,28 @@
                 return isRightType && isLt2M;
             },
 
-            //测试获取信息
-            getInfo(row){
-                console.log("111");
-                console.log(row);
-                // console.log(tableData);
-            },
             // 更新数据
-            updateUserInfo(){
-                console.log("呵呵，这是更新");
+            submitUpdate(formName){
+                // console.log(formName);
                 this.dialogFormVisible = false;
+                const params = {};
+                params.video_id = formName.video_id;
+                params.name = formName.name;
+                params.category = formName.category;
+                var tag = '';
+                for(let i of formName.tag){
+                    tag += i + ';';
+                }
+                params.tag = tag.slice(0, tag.length-1)
+                params.video_desc = formName.desc;
+                
+                this.axios.post('http://localhost:8004/api/video/updateVideo',params)
+                .then(res => {
+                    this.dialogFormVisible = false;
+                })
+                .catch(e => {
+                    
+                })
             },
             
             //对话框关闭
@@ -560,41 +564,87 @@
             },
 
             // 增加
-            addUserInfo(formName){
-                // alert("1111");
-                console.log("增加");
-                // this.resetForm(formName);
-                this.dialogFormVisible_adduser = true;
+            addVideo(formName){
+                // console.log("增加");
+                this.dialogFormVisible_addVideo = true;
             },
             // 重置添加
             resetForm(formName) { 
                 // console.log(formName);
-                // resetFields();    
-                this.$refs[formName].resetFields();   
+                // this.$refs['ruleForm'].resetFields();
+                // this.$refs.formName.resetFields();
+                console.log(this.$refs);
+                console.log(this.$refs['formName']);
+                console.log(this.$refs['ruleForm']);
+                this.$refs['ruleForm'].resetFields();
+                console.log(this.$refs.formName);
+                console.log('重置');
             },
-            // 取消添加用户
-            cancelAddUser(formName){
+            // 取消添加视频
+            cancelAddVideo(formName){
                 // this.resetForm(formName);
-                this.dialogFormVisible_adduser = false; 
-                console.log("取消");
+                this.dialogFormVisible_addVideo = false; 
+                // console.log("取消");
             },
             
-            //提交添加用户
-            submitAddUser(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        console.log(formName);
-                        this.resetForm(formName);
-                        this.dialogFormVisible_adduser = false;
+            //提交添加视频
+            submitAddVideo(formName) {
+                // console.log(formName);
+
+                // video_id: item.video_id,
+                // name: item.name,
+                // cover: item.cover,
+                // creat_time: item.creat_time,
+                // modify_time: item.modify_time,
+                // category: item.category,
+                // tag: item.tag,
+                // desc: item.video_desc,
+                // link: item.link,
+                
+                const formData = {};
+                formData.video_id = formName.video_id;
+                formData.name = formName.name;
+                formData.category = formName.category;
+                formData.video_desc = formName.desc;
+                var tag = '';
+                for(let i of formName.tag){
+                    tag += i + ';';
+                }
+                formData.tag = tag.slice(0, tag.length-1)
+                //  console.log(formData.tag);
+                this.axios.post('http://localhost:8004/api/video/addVideo',formData)
+                 .then(res => {
+                    //  console.log(res);
+                    
+                    if(res.status == 200){
                         console.log("提交成功");
-                        // alert('submit!');           
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
+                        this.dialogFormVisible_addVideo = false;
+                        console.log(res.config.data);
+                        this.tableData.push(res.config.data)
+                        
+                    }else{
+                        console.log("提交失败");
+                        this.dialogFormVisible_addVideo = false;
+                    } 
+                 })
+                 .catch(e => {
+                     console.log(e);
+                 })
                 
             },
+
+            //查询视频
+            queryVideo(key){
+                const params = {};
+                params.name = key;
+                this.axios.post('http://localhost:8004/api/video/queryVideo',params)
+                .then(res => {
+                     console.log(res.data);
+                })
+                .catch(e => {
+                    console.log(e);
+                })
+            }
             
         },
     }

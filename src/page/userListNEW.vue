@@ -11,7 +11,7 @@
                 </el-input>
                 </div>
                 <!-- 查询用户按钮 -->
-                <el-button type="primary">查询</el-button>
+                <el-button type="primary" @click="queryName">查询</el-button>
                 <!-- 增加用户按钮 -->
                 <div class="adduser-button">
                 <!-- <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button> -->
@@ -26,9 +26,6 @@
                 :expand-row-keys='expendRow'
                 :row-key="row => row.index"
                 style="width: 100%">
-            <!-- <el-table
-                :data="tableData"
-                style="width: 100%"> -->
                 <el-table-column type="expand">
                     <template slot-scope="props">
                         <el-form label-position="left" inline class="demo-table-expand">
@@ -112,15 +109,18 @@
             <el-dialog title="修改用户信息" :visible.sync="dialogFormVisible" :show-close="false" >
                 <div class="updateUserInfo">
                     <!-- <template slot-scope="props"> -->
-                        <el-form :model="updataUserInfo">
-                            <el-form-item label="用户名" label-width="100px" prop="user_name">
-                                <el-input v-model="updataUserInfo.user_name"></el-input>
+                        <el-form :model="selectTable"
+                            @expand='expand'
+                            :expand-row-keys='expendRow'
+                            :row-key="row => row.index">
+                            <el-form-item label="用户名" label-width="100px">
+                                <el-input v-model="selectTable.name"></el-input>
                             </el-form-item>
                             <el-form-item label="联系方式" label-width="100px">
-                                <el-input v-model="updataUserInfo.phone"></el-input>
+                                <el-input v-model="selectTable.phone"></el-input>
                             </el-form-item>
                             <el-form-item label="电子邮箱" label-width="100px">
-                                <el-input v-model="updataUserInfo.email"></el-input>
+                                <el-input v-model="selectTable.email"></el-input>
                             </el-form-item>
                             <!-- 头像要改 -->
                             <el-form-item label="头像" label-width="100px">
@@ -135,7 +135,7 @@
                                 </el-upload>
                             </el-form-item>
                             <el-form-item label="性别" label-width="100px">
-                                <el-radio-group v-model="updataUserInfo.sex">
+                                <el-radio-group v-model="selectTable.sex">
                                     <el-radio :label="3">男</el-radio>
                                     <el-radio :label="6">女</el-radio>
                                     <el-radio :label="9">保密</el-radio>
@@ -143,7 +143,7 @@
                             </el-form-item>
                             <el-form-item label="出生日期" label-width="100px">
                                 <el-date-picker
-                                    v-model="updataUserInfo.date"
+                                    v-model="selectTable.birth"
                                     type="date"
                                     placeholder="选择日期">
                                 </el-date-picker>
@@ -153,18 +153,16 @@
                                         type="textarea"
                                         :rows="3"
                                         placeholder="请输入内容"
-                                        v-model="updataUserInfo.desc">
+                                        v-model="selectTable.personal_signature">
                                 </el-input>
                             </el-form-item>
                         </el-form>
                     <!-- </template> -->
                     
-                
                     <div slot="footer" class="dialog-footer">
                         <el-button @click="dialogFormVisible = false">取 消</el-button>
                         <!-- <el-button type="primary" @click="updateFood">确 定</el-button> -->
-                        <el-button type="primary" @click="updateUserInfo">确 定</el-button>
-                        <el-button type="primary" @click="getInfo">取信息</el-button>
+                        <el-button type="primary" @click="updateUserInfo(selectTable)">确 定</el-button>
                     </div>
                 </div>
             </el-dialog>  
@@ -173,7 +171,18 @@
             <!-- 弹窗添加用户开始 -->  
             <!-- :before-close="handleClose"    关闭按钮回调  -->
             <el-dialog title="添加用户" :visible.sync="dialogFormVisible_adduser" :show-close="false">
-                <el-form :model="formData" status-icon :rules="rules" ref="formData" label-width="80px" class="demo-ruleForm">
+                <el-form :model="formData" 
+                    status-icon 
+                    :rules="rules" 
+                    ref="formData" 
+                    label-width="80px" 
+                    class="demo-ruleForm"
+                     @expand='expand'
+                    :expand-row-keys='expendRow'
+                    :row-key="row => row.index">
+                    <el-form-item label="测试ID" prop="user_id">
+                        <el-input v-model="formData.user_id"></el-input>
+                    </el-form-item> 
                     <el-form-item label="用户名" prop="name">
                         <el-input v-model="formData.name"></el-input>
                     </el-form-item> 
@@ -202,7 +211,7 @@
                         </el-upload>  
                     </el-form-item>
                     <el-form-item label="性别">
-                        <el-radio-group v-model="formData.radio">
+                        <el-radio-group v-model="formData.sex">
                             <el-radio :label="3">男</el-radio>
                             <el-radio :label="6">女</el-radio>
                             <el-radio :label="9">保密</el-radio>
@@ -210,7 +219,7 @@
                     </el-form-item>
                     <el-form-item label="出生日期">
                         <el-date-picker
-                            v-model="value1"
+                            v-model="formData.birth"
                             type="date"
                             placeholder="选择日期">
                         </el-date-picker>
@@ -220,7 +229,7 @@
                 <div slot="footer" class="dialog-footer">
                         <el-button @click="resetForm('formData')">重置</el-button>
                         <el-button @click="cancelAddUser('formData')">取 消</el-button>
-                        <el-button type="primary" @click="submitAddUser('formData')">确 定</el-button>
+                        <el-button type="primary" @click="submitAddUser(formData)">确 定</el-button>
                     </div>
             </el-dialog> 
             <!-- 弹窗添加用户结束 -->
@@ -273,15 +282,9 @@
             return {
                 baseUrl,
                 baseImgPath,
-
-                restaurant_id: null,
-                city: {},
-
                 // 查询
                 search_user: '',
-                tableData: [],
-          
-
+                
                 // 分页
                 currentRow: null,
                 offset: 0,
@@ -293,28 +296,11 @@
                 dialogFormVisible: false,   //编辑页面
                 dialogFormVisible_adduser: false,   //添加用户
 
-                // 更新用户信息
-                // updataUserInfo: {
-                //     user_name: '用户X',
-                //     phone: 'phone',
-                //     email: '123',
-                //     sex: 9,
-                //     date: '2010-01-01',
-                //     desc: "2334",
-                // },
-                updataUserInfo: {},
+                tableData: [],//表格数据
+                selectTable: {},//选中信息
+                updateData: {},//更新信息
+                formData: {},//添加
 
-
-                // 新增用户信息
-                formData: {
-                    name: '',
-                    email: '',
-                    phone: '',
-                    pass: '',
-                    checkPass: '',
-                    radio: 9,
-                    age: '',
-                },
                 rules: {
                     // name: [
                     //     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -351,7 +337,6 @@
                 expendRow: [],
 
                 // 无用
-                selectTable: {},
                 menuOptions: [],
                 selectMenu: {},
                 selectIndex: null,
@@ -361,7 +346,8 @@
             this.initData();   	
         },
         computed: {
-            // ...mapState(['adminInfo']),
+            // ...mapState(['adminInfo'])
+ 
         },
     	components: {
     		headTop,
@@ -420,85 +406,73 @@
 
             // 编辑
             handleEdit(index, row) {
-                console.log("编辑");
-                console.log(index, row);
-            	// this.getSelectItemData(row, 'edit')
-                // this.getSelectItemUserData(row, 'edit');
+            	this.getSelectItemUserData(row)  
                 this.dialogFormVisible = true;
-                // this.getSelectItemUserData(row, 'edit');
-
             },
 
-            getSelectItemUserData(row, type){
-                console.log("获取的信息");
-                console.log(row);
-                // console.log(row.user_name);
-                const updataUserInfo = {};
-                updataUserInfo.user_name = row.user_name;
-                updataUserInfo.push()
-                console.log(updataUserInfo.user_name);
+            //得到选择对象信息
+            getSelectItemUserData(row){
+                const selectTable = {};
+                selectTable.user_id = row.user_id;
+                selectTable.name = row.name;
+                selectTable.phone = row.phone;
+                selectTable.email = row.email;
+                selectTable.avator = row.avator;
+                selectTable.sex = this.numSex(row.sex);
+                selectTable.birth = row.birth;
+                selectTable.personal_signature = row.personal_signature;
 
-
+                this.selectTable = selectTable;
+            },
+            
+            //性别问题
+            numSex(sex){
+                if(sex == '男'){
+                    return 3;
+                }else if(sex == '女'){
+                    return 6;
+                }else if(sex == '保密'){
+                    return 9
+                }
+            },
+            TextSex(sex){
+                if(sex == 3){
+                    return '男';
+                }else if(sex == 6){
+                    return '女';
+                }else if (sex == 9){
+                    return '保密'
+                }
             },
             // 删除
             handleDelete(index, row){
-                // console.log(index, row);
-                this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                     }).then(() => {
-                        console.log(row.user_id)
-                        this.initData();   	
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!',
-                        
-                    });
+                        this.axios.get('http://localhost:8004/api/user/delUser',{
+                            params: {
+                                user_id: row.user_id,
+                            }
+                        });
+                        // .then(res => {
+                        //     console.log(res)
+                        // })
+                        // .catch(e => {
+                            
+                        // });
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
                     }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
                     });          
                 });
             },
-            // 选择
-            // async getSelectItemData(row, type){
-            // 	const restaurant = await getResturantDetail(row.restaurant_id);
-            // 	const category = await getMenuById(row.category_id)
-            //     this.selectTable = {...row, ...{restaurant_name: restaurant.name, restaurant_address: restaurant.address, category_name: category.name}};
-
-            //     this.selectMenu = {label: category.name, value: row.category_id}
-            //     this.tableData.splice(row.index, 1, {...this.selectTable});
-            //     this.$nextTick(() => {
-            //         this.expendRow.push(row.index);
-            //     })
-            //     if (type == 'edit' && this.restaurant_id != row.restaurant_id) {
-            //     	this.getMenu();
-            //     }
-            // },
-
-
-            // async handleDelete(index, row) {
-            //     try{
-            //         const res = await deleteFood(row.item_id);
-            //         if (res.status == 1) {
-            //             this.$message({
-            //                 type: 'success',
-            //                 message: '删除食品成功'
-            //             });
-            //             this.tableData.splice(index, 1);
-            //         }else{
-            //             throw new Error(res.message)
-            //         }
-            //     }catch(err){
-            //         this.$message({
-            //             type: 'error',
-            //             message: err.message
-            //         });
-            //         console.log('删除食品失败')
-            //     }
-            // },
 
             // 上传图片
             handleServiceAvatarScucess(res, file) {
@@ -521,18 +495,38 @@
                 return isRightType && isLt2M;
             },
 
-            //测试获取信息
-            getInfo(row){
-                console.log("111");
-                console.log(row);
-                // console.log(tableData);
-            },
+
             // 更新数据
-            updateUserInfo(){
-                console.log("呵呵，这是更新");
+            updateUserInfo(selectTable){
+                // console.log(selectTable);
+                //数据缓存
+                const updateData= {};
+                updateData.user_id = selectTable.user_id;
+                updateData.name = selectTable.name;
+                updateData.avator = selectTable.avator;
+                updateData.birth = selectTable.birth;
+                updateData.phone = selectTable.phone;
+                updateData.email = selectTable.email;
+                updateData.sex = this.TextSex(selectTable.sex);
+                updateData.personal_signature = selectTable.personal_signature;
+                               
                 this.dialogFormVisible = false;
+
+                 //调用请求
+                console.log(updateData);
+                // this.$forceUpdate();
+                this.axios.post('http://localhost:8004/api/user/updateUserInfo',updateData)
+                .then(res => {
+                     console.log(res.data);
+                    //  this.tableData.push(res.data);
+                    // initData();
+                })
+                .catch(e => {
+                    console.log(e);
+                });
+                
+                
             },
-            
             //对话框关闭
             handleClose(done,formName) {
                 this.$confirm('是否保存数据？')
@@ -564,21 +558,51 @@
             },
             
             //提交添加用户
-            submitAddUser(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        console.log(formName);
-                        this.resetForm(formName);
+            submitAddUser(formData) {
+                // console.log(formData);
+                // console.log(formData.name);
+                this.axios.post('http://localhost:8004/api/user/addUser',formData)
+                .then(res => {
+                    console.log(res);
+                    if(res.status == 200){
                         console.log("提交成功");
                         this.dialogFormVisible_adduser = false;
-                        // alert('submit!');           
-                    } else {
-                        console.log('error submit!!');
-                        return false;
+                    }else{
+                        console.log("提交失败");
+                        this.dialogFormVisible_adduser = false;
                     }
-                });
-                
+                    // this.$refs[formData].validate((res) => {
+                    //     if (res) {
+                    //         console.log(formData);
+                    //         this.resetForm(formData);
+                    //         console.log("提交成功");
+                    //         this.dialogFormVisible_adduser = false;
+                    //         // alert('submit!');           
+                    //     } else {
+                    //         console.log('error submit!!');
+                    //         return false;
+                    //     }
+                    // });
+                })
+                .catch(e => {
+                    console.log(e);
+                })
             },
+            
+            //查询
+            queryName(){
+                const name = this.search_user
+                // console.log('查询', name);
+                this.axios.post('http://localhost:8004/api/user/queryUser',{
+                    name: name,
+                })
+                .then(res => {
+                     console.log(res.data);
+                })
+                .catch(e => {
+                    
+                })
+            }
             
         },
     }

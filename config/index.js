@@ -29,33 +29,33 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    // proxyTable: {},
-    proxyTable: {
-      '/api/videoInfo': {
-          target: 'http://localhost:8004',//目标接口域名
-          changeOrigin: true,//是否跨域
-          pathRewrite: {
-            '^/api': '/api/videoInfo'//重写接口,后面可以使重写的新路径，一般不做更改
-           }
-      }
-    },
+    proxyTable: {},
+//     proxyTable: {
+//       '/': {
+//           target: 'http://localhost:8004',//目标接口域名
+//           changeOrigin: true,//是否跨域
+//           pathRewrite: {
+//             '^/api': ''//重写接口,后面可以使重写的新路径，一般不做更改
+//            }
+//       }
+//     },
     
-    context: [ //代理路径
-        '/shopping',
-        '/ugc',
-        '/v1',
-        '/v2',
-        '/v3',
-        '/v4',
-        '/bos',
-        '/member',
-        '/promotion',
-        '/eus',
-        '/payapi',
-        '/admin',
-        '/statis',
-        '/img',
-    ],
+    // context: [ //代理路径
+    //     '/shopping',
+    //     '/ugc',
+    //     '/v1',
+    //     '/v2',
+    //     '/v3',
+    //     '/v4',
+    //     '/bos',
+    //     '/member',
+    //     '/promotion',
+    //     '/eus',
+    //     '/payapi',
+    //     '/admin',
+    //     '/statis',
+    //     '/img',
+    // ],
 
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
