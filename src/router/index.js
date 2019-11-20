@@ -8,9 +8,9 @@ const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manag
 const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
 
 const userList = r => require.ensure([], () => r(require('@/page/userList')), 'userList');
-const userListNEW = r => require.ensure([], () => r(require('@/page/userListNEW')), 'userListNEW');
+// const userListNEW = r => require.ensure([], () => r(require('@/page/userListNEW')), 'userListNEW');
 const adminList = r => require.ensure([], () => r(require('@/page/adminList')), 'adminList');
-const adminListNEW = r => require.ensure([], () => r(require('@/page/adminListNEW')), 'adminListNEW');
+// const adminListNEW = r => require.ensure([], () => r(require('@/page/adminListNEW')), 'adminListNEW');
 const shopList = r => require.ensure([], () => r(require('@/page/shopList')), 'shopList');
 const foodList = r => require.ensure([], () => r(require('@/page/foodList')), 'foodList');
 const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
@@ -84,10 +84,6 @@ const routes = [
 			component: userList,
 			meta: ['数据管理', '用户列表'],
 		},{
-			path: '/userListNEW',
-			component: userListNEW,
-			meta: ['数据管理', '用户列表(新)'],
-		},{
 			path: '/shopList',
 			component: shopList,
 			meta: ['数据管理', '商家列表'],
@@ -103,10 +99,6 @@ const routes = [
 			path: '/adminList',
 			component: adminList,
 			meta: ['数据管理', '管理员列表'],
-		},{
-			path: '/adminListNEW',
-			component: adminListNEW,
-			meta: ['数据管理', '管理员列表(新)'],
 		},{
 			path: '/videoList',
 			component: videoList,

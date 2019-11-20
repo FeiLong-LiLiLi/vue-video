@@ -9,8 +9,8 @@
 						<template slot="title"><i class="el-icon-document"></i>数据管理</template>
 						<!-- <el-menu-item index="userList">用户列表</el-menu-item>	 -->
 						<!-- <el-menu-item index="adminList">管理员列表</el-menu-item> -->
-						<el-menu-item index="/userListNEW">用户列表（新）</el-menu-item>	
-						<el-menu-item index="/adminListNEW">管理员列表（新）</el-menu-item>	
+						<el-menu-item index="/userList">用户列表</el-menu-item>	
+						<el-menu-item index="/adminList">管理员列表</el-menu-item>	
 						<el-menu-item index="/videoList">视频列表</el-menu-item>	
 						<el-menu-item index="/messageList">通知列表</el-menu-item>				
 						<!-- <el-menu-item index="shopList">商家列表</el-menu-item> -->

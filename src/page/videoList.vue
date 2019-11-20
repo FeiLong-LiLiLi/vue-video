@@ -52,7 +52,7 @@
                                 <span>{{ props.row.tag }}</span>
                             </el-form-item>
                             <el-form-item label="视频简介">
-                                <span>{{ props.row.desc }}</span>
+                                <span>{{ props.row.video_desc }}</span>
                             </el-form-item>
                             <el-form-item label="视频链接">
                                 <span>{{ props.row.link }}</span>
@@ -77,7 +77,7 @@
                 </el-table-column>
                 <el-table-column
                   label="视频简介"
-                  prop="desc">
+                  prop="video_desc">
                 </el-table-column>
                 <el-table-column label="操作">
                   <template slot-scope="scope">
@@ -155,7 +155,7 @@
                                         type="textarea"
                                         :rows="3"
                                         placeholder="请输入内容"
-                                        v-model="selectTable.desc">
+                                        v-model="selectTable.video_desc">
                                 </el-input>
                             </el-form-item>
                         </el-form>
@@ -247,7 +247,7 @@
                             type="textarea"
                             :rows="3"
                             placeholder="请输入内容"
-                            v-model="ruleForm.desc">
+                            v-model="ruleForm.video_desc">
                         </el-input>
                     </el-form-item>
                 </el-form>
@@ -348,11 +348,6 @@
                     showVideoPath: ''
                 },
 
-                // 无用
-
-                menuOptions: [],
-                selectMenu: {},
-                selectIndex: null,
             }
         },
         created(){
@@ -380,7 +375,7 @@
                                 modify_time: item.modify_time,
                                 category: item.category,
                                 tag: item.tag,
-                                desc: item.video_desc,
+                                video_desc: item.video_desc,
                                 link: item.link,
                             }
                             this.tableData.push(tableItem);
@@ -412,54 +407,60 @@
 
             // 编辑
             handleEdit(index, row) {
-                console.log("编辑");
+                // console.log("编辑");
                 // // console.log(row);
                 const selectTable = {};
+                selectTable.index = index;
                 selectTable.category = row.category;
                 // // selectTable.cover = row.cover;
                 // // selectTable.creat_time = row.creat_time;
-                selectTable.desc = row.desc;
+                selectTable.video_desc = row.video_desc;
                 // selectTable.link = row.link;
                 // // selectTable.modify_time = row.modify_time;
                 selectTable.video_id = row.video_id;
                 selectTable.name = row.name;
                 // selectTable.tag = row.tag;
                 // selectTable.tag = [];
+
                 if(row.tag.length > 0){
                     selectTable.tag = row.tag.split(';'); 
                 }else{
                     selectTable.tag = [];
                 }
+
+                // this.selectTable.tag = this.toArrTag(row.tag);
                 this.selectTable = selectTable;
                 this.dialogFormVisible = true;
             },
             
+            //tag转换数组
+            toArrTag(str){
+                if(str.length > 0){
+                    return row.tag.split(';');
+                }else{
+                    return []
+                }
+            },
 
 
             // 删除
             handleDelete(index, row){
-                console.log(index);
-                console.log(row);
                 this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                     }).then(() => {
                         this.axios.get('http://localhost:8004/api/video/delVideo',{
-                                params: {
-                                    video_id: row.video_id,
-                                }
-                            })
-                            // .then(res => {
-                            //     console.log('删除');
-                            // })
-                            // .catch(e => {
-                                
-                            // });
-                        this.tableData.splice(index,1)
-                        this.$message({
-                            type: 'success',
-                            message: '删除成功!'
+                            params: {video_id: row.video_id,}
+                        }).then(res => {
+                            // console.log('删除');
+                            this.tableData.splice(index,1)
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        }).catch(e => {
+                          console.log(e)  
                         });
                     }).catch(() => {
                         this.$message({
@@ -503,11 +504,15 @@
                     tag += i + ';';
                 }
                 params.tag = tag.slice(0, tag.length-1)
-                params.video_desc = formName.desc;
+                params.video_desc = formName.video_desc;
                 
                 this.axios.post('http://localhost:8004/api/video/updateVideo',params)
                 .then(res => {
                     this.dialogFormVisible = false;
+                    this.tableData.splice(formName.index, 1, params);
+                    // console.log(res);
+                    // console.log(formName.index)
+                    
                 })
                 .catch(e => {
                     
@@ -570,7 +575,6 @@
             },
             // 重置添加
             resetForm(formName) { 
-                // console.log(formName);
                 // this.$refs['ruleForm'].resetFields();
                 // this.$refs.formName.resetFields();
                 console.log(this.$refs);
@@ -584,43 +588,31 @@
             cancelAddVideo(formName){
                 // this.resetForm(formName);
                 this.dialogFormVisible_addVideo = false; 
-                // console.log("取消");
+      
             },
             
             //提交添加视频
             submitAddVideo(formName) {
-                // console.log(formName);
-
-                // video_id: item.video_id,
-                // name: item.name,
-                // cover: item.cover,
-                // creat_time: item.creat_time,
-                // modify_time: item.modify_time,
-                // category: item.category,
-                // tag: item.tag,
-                // desc: item.video_desc,
-                // link: item.link,
-                
                 const formData = {};
                 formData.video_id = formName.video_id;
                 formData.name = formName.name;
                 formData.category = formName.category;
-                formData.video_desc = formName.desc;
+                formData.video_desc = formName.video_desc;
                 var tag = '';
                 for(let i of formName.tag){
                     tag += i + ';';
                 }
-                formData.tag = tag.slice(0, tag.length-1)
+                formData.tag = tag.slice(0, tag.length-1)   
                 //  console.log(formData.tag);
                 this.axios.post('http://localhost:8004/api/video/addVideo',formData)
                  .then(res => {
-                    //  console.log(res);
-                    
+                    //  console.log(res);   
                     if(res.status == 200){
                         console.log("提交成功");
+                        // this.tableData = [];
+                        // this.initData();
                         this.dialogFormVisible_addVideo = false;
-                        console.log(res.config.data);
-                        this.tableData.push(res.config.data)
+                        this.tableData.push(formData);
                         
                     }else{
                         console.log("提交失败");
@@ -639,7 +631,24 @@
                 params.name = key;
                 this.axios.post('http://localhost:8004/api/video/queryVideo',params)
                 .then(res => {
-                     console.log(res.data);
+                    if(res.status == 200){
+                        this.tableData = [];
+                        const tableData = [];
+                        res.data.forEach(item => {
+                            const tableItem = {
+                                video_id: item.video_id,
+                                name: item.name,
+                                cover: item.cover,
+                                creat_time: item.creat_time,
+                                modify_time: item.modify_time,
+                                category: item.category,
+                                tag: item.tag,
+                                video_desc: item.video_desc,
+                                link: item.link,
+                            }
+                            this.tableData.push(tableItem);
+                        });
+                    }                  
                 })
                 .catch(e => {
                     console.log(e);
