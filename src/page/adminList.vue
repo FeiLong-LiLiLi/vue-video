@@ -35,9 +35,9 @@
                             <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
                             </el-form-item>
-                            <el-form-item label="管理员 ID">
+                            <!-- <el-form-item label="管理员 ID">
                                 <span>{{ props.row.admin_id }}</span>
-                            </el-form-item>
+                            </el-form-item> -->
                             <el-form-item label="联系方式">
                                 <span>{{ props.row.phone }}</span>
                             </el-form-item>
@@ -69,11 +69,11 @@
                     prop="name"
                     width="200">
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                     label="管理员 ID"
                     prop="admin_id"
                     width="200">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                   label="个性签名"
                   prop="personal_signature">
@@ -170,9 +170,9 @@
             <!-- :before-close="handleClose"    关闭按钮回调  -->
             <el-dialog title="添加管理员" :visible.sync="dialogFormVisible_add" :show-close="false">
                 <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
-                    <el-form-item label="用户ID" prop="id">
+                    <!-- <el-form-item label="用户ID" prop="id">
                         <el-input v-model="ruleForm.admin_id"></el-input>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item label="用户名" prop="name">
                         <el-input v-model="ruleForm.name"></el-input>
                     </el-form-item> 

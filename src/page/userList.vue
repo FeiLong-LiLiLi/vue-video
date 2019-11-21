@@ -35,9 +35,9 @@
                             <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
                             </el-form-item>
-                            <el-form-item label="用户 ID">
+                            <!-- <el-form-item label="用户 ID">
                                 <span>{{ props.row.user_id }}</span>
-                            </el-form-item>
+                            </el-form-item> -->
                             <el-form-item label="联系方式">
                                 <span>{{ props.row.phone }}</span>
                             </el-form-item>
@@ -69,11 +69,11 @@
                     prop="name"
                     width="200">
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                     label="用户 ID"
                     prop="user_id"
                     width="200">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                   label="个性签名"
                   prop="personal_signature">
@@ -180,9 +180,9 @@
                      @expand='expand'
                     :expand-row-keys='expendRow'
                     :row-key="row => row.index">
-                    <el-form-item label="测试ID" prop="user_id">
+                    <!-- <el-form-item label="测试ID" prop="user_id">
                         <el-input v-model="formData.user_id"></el-input>
-                    </el-form-item> 
+                    </el-form-item>  -->
                     <el-form-item label="用户名" prop="name">
                         <el-input v-model="formData.name"></el-input>
                     </el-form-item> 

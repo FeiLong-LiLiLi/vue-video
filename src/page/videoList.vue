@@ -36,9 +36,9 @@
                                 <span>{{ props.row.avater }}</span>
                                 <img src="" alt="" class="video-cover">
                             </el-form-item>
-                            <el-form-item label="视频 ID">
+                            <!-- <el-form-item label="视频 ID">
                                 <span>{{ props.row.video_id }}</span>
-                            </el-form-item>
+                            </el-form-item> -->
                             <el-form-item label="发布时间">
                                 <span>{{ props.row.creat_time }}</span>
                             </el-form-item>
@@ -70,11 +70,11 @@
                     prop="name"
                     width="200">
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                     label="视频 ID"
                     prop="video_id"
                     width="200">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                   label="视频简介"
                   prop="video_desc">
@@ -196,9 +196,9 @@
                             </el-upload>     
                         </div>
                     </el-form-item>
-                    <el-form-item label="视频 ID">
+                    <!-- <el-form-item label="视频 ID">
                         <el-input v-model="ruleForm.video_id"></el-input>
-                    </el-form-item> 
+                    </el-form-item>  -->
                     <el-form-item label="视频名称">
                         <el-input v-model="ruleForm.name"></el-input>
                     </el-form-item> 
