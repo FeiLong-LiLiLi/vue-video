@@ -366,7 +366,7 @@
                     // console.log(res);
                     if(res.status == 200){
                         const tableData = [];
-                        res.data.forEach(item => {
+                        res.data.data.forEach(item => {
                             const tableItem = {
                                 video_id: item.video_id,
                                 name: item.name,
@@ -612,7 +612,7 @@
                         // this.tableData = [];
                         // this.initData();
                         this.dialogFormVisible_addVideo = false;
-                        this.tableData.push(formData);
+                        this.tableData.push(res.data.data);
                         
                     }else{
                         console.log("提交失败");
@@ -634,7 +634,7 @@
                     if(res.status == 200){
                         this.tableData = [];
                         const tableData = [];
-                        res.data.forEach(item => {
+                        res.data.data.dataforEach(item => {
                             const tableItem = {
                                 video_id: item.video_id,
                                 name: item.name,

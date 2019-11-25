@@ -188,8 +188,7 @@
                     <el-form-item label="确认密码" prop="checkPass">
                         <el-input type="password" v-model="ruleForm.checkPass" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="上传头像">
-                        <!-- action="https://jsonplaceholder.typicode.com/posts/"  路径 -->
+                    <!-- <el-form-item label="上传头像">
                         <el-upload
                             class="avatar-uploader"
                             :action="baseUrl + '/v1/addimg/food'"
@@ -213,10 +212,8 @@
                             type="date"
                             placeholder="选择日期">
                         </el-date-picker>
-                    </el-form-item>
-                    <!-- <el-form-item label="年龄" prop="age">
-                        <el-input v-model.number="ruleForm2.age"></el-input>
                     </el-form-item> -->
+                
 
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -394,7 +391,7 @@
                 //    console.log(res); 
                    if(res.status == 200){
                        this.tableData = [];
-                       res.data.forEach(item => {
+                       res.data.data.forEach(item => {
                            const tableItem = {
                                 admin_id: item.admin_id,
                                 name: item.name,
@@ -476,7 +473,7 @@
                 params.sex = this.toTextSex(formName.sex);
                 this.axios.post('http://localhost:8004/api/admin/updateAdmin',params)
                 .then(res => {
-                    //  console.log(res);
+                     console.log(res);
                      this.dialogFormVisible = false;
                      this.tableData.splice(params.index, 1, params)
                 }) 
@@ -568,14 +565,6 @@
             
             //提交添加用户
             submitAddUser(formName) {
-                // console.log(formName);
-                // const params = {};
-                // params.admin_id = formName.admin_id;
-                // params.name = formName.name;
-                // params.password = formName.pass;
-                // params.phone = formName.phone;
-                // params.email = formName.email;
-                // params.birth = formName.birth;
                 const params = formName;
                 params.sex = this.toTextSex(formName.sex);
                 // params.personal_signature = formName.admin_id;
@@ -586,7 +575,7 @@
                     if(res.status == 200){
                         console.log('添加成功');
                         this.dialogFormVisible_add = false;
-                        this.tableData.push(params);
+                        this.tableData.push(res.data.data);
                     }else{
                         console.log('添加失败');
                         this.dialogFormVisible_add = false;
@@ -605,7 +594,7 @@
                     //  console.log(res);
                      if(res.status == 200){
                          this.tableData = [];
-                         res.data.forEach(item => {
+                         res.data.data.forEach(item => {
                              const tableItem = {
                                  admin_id: item.admin_id,
                                  name: item.name,

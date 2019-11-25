@@ -198,8 +198,8 @@
                     <el-form-item label="确认密码" prop="checkPass">
                         <el-input type="password" v-model="formData.checkPass" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="上传头像">
-                        <!-- action="https://jsonplaceholder.typicode.com/posts/"  路径 -->
+                    <!-- action="https://jsonplaceholder.typicode.com/posts/"  路径 -->
+                    <!-- <el-form-item label="上传头像"> 
                         <el-upload
                             class="avatar-uploader"
                             :action="baseUrl + '/v1/addimg/food'"
@@ -223,7 +223,7 @@
                             type="date"
                             placeholder="选择日期">
                         </el-date-picker>
-                    </el-form-item>
+                    </el-form-item> -->
                    
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -360,8 +360,8 @@
                     // console.log(res);
                     if(res.status == 200){
                         this.tableData = [];
-                        // console.log(res.data);
-                        res.data.forEach(item =>{
+
+                        res.data.data.forEach(item =>{
                             const tableItem = {
                                 user_id: item.user_id,
                                 name: item.name,
@@ -559,7 +559,7 @@
                     if(res.status == 200){
                         console.log("提交成功");
                         this.dialogFormVisible_adduser = false;
-                        this.tableData.push(formData);
+                        this.tableData.push(res.data.data);
                     }else{
                         console.log("提交失败");
                         this.dialogFormVisible_adduser = false;
@@ -577,9 +577,8 @@
                     name: name,
                 }).then(res => {
                     if(res.status == 200){
-                        // console.log(res.data);
                         this.tableData = [];
-                        res.data.forEach(item =>{
+                        res.data.data.forEach(item =>{
                             const tableItem = {
                                 user_id: item.user_id,
                                 name: item.name,
@@ -659,5 +658,12 @@
         margin-right: 200px;
         float: right;
     }
+    .el-dialog--small{
+        width: 35%;
+    }
+    .el-dialog__body{
+        margin: 0 50px 0  30px;
+    }
+
 
 </style>
