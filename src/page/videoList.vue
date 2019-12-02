@@ -299,7 +299,6 @@
                     tag: '',
                 },
 
-                // 新增用户信息
                 ruleForm: {
                     category: '',
                     tag: ''
@@ -311,22 +310,11 @@
                     ],
                 },
                 //视频类别
-                choose_category: [{
-                    value: '综艺',
-                    label: '综艺'
-                    }, {
-                    value: '动漫',
-                    label: '动漫'
-                }],
-                
-                //视频标签
-                choose_tag: [{
-                    value: 'HTML',
-                    label: 'HTML'
-                    }, {
-                    value: 'JavaScript',
-                    label: 'JavaScript'
-                    }],
+                choose_category:[],
+                choose_tag: [],
+    
+
+                www: [{},{},{}],
 
                  //日期
                 pickerOptions1: {
@@ -352,6 +340,8 @@
         },
         created(){
             this.initData();
+            this.initCategories();
+            this.initTags();
         },
         computed: {
             // ...mapState(['adminInfo']),
@@ -360,13 +350,13 @@
     		headTop,
     	},
         methods: {    
-            initData(){
+            async initData(){
                 this.axios.get('http://localhost:8004/api/video/videoInfo')
                 .then(res => {
                     // console.log(res);
                     if(res.status == 200){
                         const tableData = [];
-                        res.data.data.forEach(item => {
+                        res.data.video.forEach(item => {
                             const tableItem = {
                                 video_id: item.video_id,
                                 name: item.name,
@@ -385,7 +375,40 @@
                 .catch(e => {
                     console.log(e);
                 })
-            },  
+            },
+            async initCategories(){
+                this.axios.get('http://localhost:8004/api/categories/get')
+                .then(res => {
+                    if(res.status == 200){
+                        // console.log(res.data.categories)
+                        const choose_category = [];
+                        res.data.categories.forEach(item => {
+                            const tableItem = {
+                                value: item.value,
+                                label: item.label
+                            }
+                            this.choose_category.push(tableItem)
+                        })
+                    }
+                })
+            }, 
+            async initTags(){
+                this.axios.get('http://localhost:8004/api/tags/get')
+                .then(res =>{
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            const choose_tag = [];
+                            res.data.tags.forEach(item => {
+                                const tableItem ={
+                                    value: item.value,
+                                    label: item.label
+                                }
+                                this.choose_tag.push(tableItem)
+                            })
+                        }
+                    }
+                })
+            },
             // 分页
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -412,15 +435,9 @@
                 const selectTable = {};
                 selectTable.index = index;
                 selectTable.category = row.category;
-                // // selectTable.cover = row.cover;
-                // // selectTable.creat_time = row.creat_time;
                 selectTable.video_desc = row.video_desc;
-                // selectTable.link = row.link;
-                // // selectTable.modify_time = row.modify_time;
                 selectTable.video_id = row.video_id;
                 selectTable.name = row.name;
-                // selectTable.tag = row.tag;
-                // selectTable.tag = [];
 
                 if(row.tag.length > 0){
                     selectTable.tag = row.tag.split(';'); 
@@ -509,7 +526,11 @@
                 this.axios.post('http://localhost:8004/api/video/updateVideo',params)
                 .then(res => {
                     this.dialogFormVisible = false;
-                    this.tableData.splice(formName.index, 1, params);
+                    const resData = params;
+                    resData.creat_time = res.data.video.creat_time;
+                    resData.modify_time = res.data.video.modify_time;
+                    resData.link = res.data.video.link
+                    this.tableData.splice(formName.index, 1, resData);
                     // console.log(res);
                     // console.log(formName.index)
                     
@@ -612,7 +633,7 @@
                         // this.tableData = [];
                         // this.initData();
                         this.dialogFormVisible_addVideo = false;
-                        this.tableData.push(res.data.data);
+                        this.tableData.push(res.data.video);
                         
                     }else{
                         console.log("提交失败");
@@ -634,7 +655,8 @@
                     if(res.status == 200){
                         this.tableData = [];
                         const tableData = [];
-                        res.data.data.dataforEach(item => {
+                        // console.log(res)
+                        res.data.video.forEach(item => {
                             const tableItem = {
                                 video_id: item.video_id,
                                 name: item.name,

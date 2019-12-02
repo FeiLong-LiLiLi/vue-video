@@ -17,11 +17,6 @@ const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 
 const videoList = r => require.ensure([], () => r(require('@/page/videoList')), 'videoList');
 const messageList = r => require.ensure([], () => r(require('@/page/messageList')), 'messageList');
 
-// const addShop = r => require.ensure([], () => r(require('@/page/addShop')), 'addShop');
-// const addGoods = r => require.ensure([], () => r(require('@/page/addGoods')), 'addGoods');
-// const addUser = r => require.ensure([], () => r(require('@/page/addUser')), 'addUser');
-// const addAdmin = r => require.ensure([], () => r(require('@/page/addAdmin')), 'addAdmin');
-// const addVideo = r => require.ensure([], () => r(require('@/page/addVideo')), 'addVideo');
 
 const userData = r => require.ensure([], () => r(require('@/page/userData')), 'userData');
 const adminData = r => require.ensure([], () => r(require('@/page/adminData')), 'adminData');
@@ -37,6 +32,9 @@ const videoMonitoring = r => require.ensure([], () => r(require('@/page/videoMon
 
 const userMonView = r => require.ensure([], () => r(require('@/page/userMonView')), 'userMonView');
 const videoMonView = r => require.ensure([], () => r(require('@/page/videoMonView')), 'videoMonView');
+
+const videoCategory = r => require.ensure([], () => r(require('@/page/videoCategory')), 'videoCategory');
+const videoTag = r => require.ensure([], () => r(require('@/page/videoTag')), 'videoTag');
 
 const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
 
@@ -57,29 +55,7 @@ const routes = [
 			path: '',
 			component: home,
 			meta: [],
-		},
-		// {
-		// 	path: '/addShop',
-		// 	component: addShop,
-		// 	meta: ['添加数据', '添加商铺'],
-		// },{
-		// 	path: '/addGoods',
-		// 	component: addGoods,
-		// 	meta: ['添加数据', '添加商品'],
-		// },{
-		// 	path: '/addUser',
-		// 	component: addUser,
-		// 	meta: ['添加数据', '添加用户'],
-		// },{
-		// 	path: '/addAdmin',
-		// 	component: addAdmin,
-		// 	meta: ['添加数据', '添加管理员'],
-		// },{
-		// 	path: '/addVideo',
-		// 	component: addVideo,
-		// 	meta: ['添加数据', '添加视频'],
-		// },
-		{
+		},{
 			path: '/userList',
 			component: userList,
 			meta: ['数据管理', '用户列表'],
@@ -135,6 +111,14 @@ const routes = [
 			path: '/videoMonitoring/videoMonView',
 			component: videoMonView,
 			meta: ['实时监控', '视频监控','视频监控视图'],
+		},{
+			path: '/videoCategory',
+			component: videoCategory,
+			meta: ['数据管理', '视频类型'],
+		},{
+			path: '/videoTag',
+			component: videoTag,
+			meta: ['数据管理', '视频标签'],
 		},{
 			path: '/uploadImg',
 			component: uploadImg,

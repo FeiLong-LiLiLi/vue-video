@@ -6,16 +6,11 @@
 					<el-menu-item index="manage"><i class="el-icon-menu"></i>首页
 					</el-menu-item>
 					<el-submenu index="1">
-						<template slot="title"><i class="el-icon-document"></i>数据管理</template>
-						<!-- <el-menu-item index="userList">用户列表</el-menu-item>	 -->
-						<!-- <el-menu-item index="adminList">管理员列表</el-menu-item> -->
+						<template slot="title"><i class="el-icon-document"></i>数据列表</template>
 						<el-menu-item index="/userList">用户列表</el-menu-item>	
 						<el-menu-item index="/adminList">管理员列表</el-menu-item>	
 						<el-menu-item index="/videoList">视频列表</el-menu-item>	
 						<el-menu-item index="/messageList">通知列表</el-menu-item>				
-						<!-- <el-menu-item index="shopList">商家列表</el-menu-item> -->
-						<!-- <el-menu-item index="foodList">食品列表</el-menu-item> -->
-						<!-- <el-menu-item index="orderList">订单列表</el-menu-item> -->
 					</el-submenu>
 					<el-submenu index="2">
 						<template slot="title"><i class="el-icon-star-on"></i>数据统计</template>
@@ -31,13 +26,18 @@
 						<el-menu-item index="/videoMonitoring">视频监控</el-menu-item>
 					</el-submenu>
 					<el-submenu index="4">
+						<template slot="title"><i class="el-icon-view"></i>数据管理</template>
+						<el-menu-item index="/videoCategory">视频类型</el-menu-item>
+						<el-menu-item index="/videoTag">视频标签</el-menu-item>
+					</el-submenu>
+					<el-submenu index="5">
 						<template slot="title"><i class="el-icon-setting"></i>个人中心</template>
 						<!-- <el-menu-item index="adminSet">管理员信息</el-menu-item> -->
 						<el-menu-item index="/adminSet">个人信息</el-menu-item>
 						<!-- <el-menu-item index="adminper">我的权限</el-menu-item> -->
 						<el-menu-item index="/sendMessage">我的权限</el-menu-item>
 					</el-submenu>
-					<el-submenu index="5">
+					<el-submenu index="6">
 						<template slot="title"><i class="el-icon-warning"></i>说明</template>
 						<el-menu-item index="/explain">说明</el-menu-item>
 					</el-submenu>
