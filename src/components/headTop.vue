@@ -8,7 +8,6 @@
 		<el-dropdown @command="handleCommand" menu-align='start'>
 			<!-- <img :src="baseImgPath + adminInfo.avatar" class="avator"> -->
 			<img  class="avator">
-			<img class="avator">
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="home">首页</el-dropdown-item>
 				<el-dropdown-item command="signout">退出</el-dropdown-item>
@@ -18,8 +17,8 @@
 </template>
 
 <script>
-	// import {signout} from '@/api/getData'
-	import {baseImgPath} from '@/config/env'
+	import {signout} from '@/api/getData'
+	// import {baseImgPath} from '@/config/env'
 	import {mapActions, mapState} from 'vuex'
 
     export default {
@@ -28,16 +27,16 @@
     			baseImgPath,
     		}
     	},
-    	// created(){
-    	// 	if (!this.adminInfo.id) {
-    	// 		this.getAdminData()
-    	// 	}
-    	// },
+    	created(){
+    		if (!this.adminInfo.id) {
+    			this.getAdminData()
+    		}
+    	},
     	computed: {
     		...mapState(['adminInfo']),
     	},
 		methods: {
-			// ...mapActions(['getAdminData']),
+			...mapActions(['getAdminData']),
 			async handleCommand(command) {
 				if (command == 'home') {
 					this.$router.push('/manage');//路由首页
@@ -76,7 +75,7 @@
 	.avator{
 		.wh(36px, 36px);
 		border-radius: 50%;
-		margin-right: 37px;
+		margin-right: 50px;
 	}
 	.el-dropdown-menu__item{
         text-align: center;

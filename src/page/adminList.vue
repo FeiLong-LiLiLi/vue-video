@@ -140,7 +140,7 @@
                             </el-form-item>
                             <el-form-item label="出生日期" label-width="100px">
                                 <el-date-picker
-                                    v-model="updateData.date"
+                                    v-model="updateData.birth"
                                     type="date"
                                     placeholder="选择日期">
                                 </el-date-picker>
@@ -188,33 +188,6 @@
                     <el-form-item label="确认密码" prop="checkPass">
                         <el-input type="password" v-model="ruleForm.checkPass" auto-complete="off"></el-input>
                     </el-form-item>
-                    <!-- <el-form-item label="上传头像">
-                        <el-upload
-                            class="avatar-uploader"
-                            :action="baseUrl + '/v1/addimg/food'"
-                            :show-file-list="false"
-                            :on-success="handleServiceAvatarScucess"
-                            :before-upload="beforeAvatarUpload">
-                            <img v-if="selectTable.image_path" :src="baseImgPath + selectTable.image_path" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>  
-                    </el-form-item>
-                    <el-form-item label="性别">
-                        <el-radio-group v-model="ruleForm.sex">
-                            <el-radio :label="3">男</el-radio>
-                            <el-radio :label="6">女</el-radio>
-                            <el-radio :label="9">保密</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="出生日期">
-                        <el-date-picker
-                            v-model="value1"
-                            type="date"
-                            placeholder="选择日期">
-                        </el-date-picker>
-                    </el-form-item> -->
-                
-
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                         <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -397,7 +370,7 @@
                                 name: item.name,
                                 phone: item.phone,
                                 email: item.email,
-                                creat_time:item.creat_time,
+                                creat_time:item.creat_time.substring(0, 11),
                                 sex: item.sex,
                                 birth: item.birth,
                                 personal_signature: item.personal_signature,
@@ -471,11 +444,21 @@
             updateSubmit(formName){
                 const params = formName;
                 params.sex = this.toTextSex(formName.sex);
+                // console.log(params)
+                this.dialogFormVisible = false;
                 this.axios.post('http://localhost:8004/api/admin/updateAdmin',params)
                 .then(res => {
-                     console.log(res);
-                     this.dialogFormVisible = false;
-                     this.tableData.splice(params.index, 1, params)
+                        // console.log(res);
+                     if(res.status ==200){
+                        const resData = res.data.admin;
+                        resData.creat_time = res.data.admin.creat_time.substring(0, 11);
+                        this.tableData.splice(params.index, 1, resData);
+                        this.$message({
+                            showClose: true,
+                            message: res.data.msg,
+                            type: 'success'
+                        });
+                    }
                 }) 
                 .catch(e => {
                     console.log(e)
@@ -565,8 +548,10 @@
             
             //提交添加用户
             submitAddUser(formName) {
+                console.log(formName);
                 const params = formName;
-                params.sex = this.toTextSex(formName.sex);
+                params.psw =formName.checkPass;
+                // params.sex = this.toTextSex(formName.sex);
                 // params.personal_signature = formName.admin_id;
                
                 this.axios.post('http://localhost:8004/api/admin/addAdmin', params)
@@ -600,7 +585,7 @@
                                  name: item.name,
                                  phone: item.email,
                                  email: item.email,
-                                 creat_time: item.creat_time,
+                                 creat_time: item.creat_time.substring(0, 11),
                                  sex: item.sex,
                                  birth: item.birth,
                                  personal_signature: item.personal_signature,

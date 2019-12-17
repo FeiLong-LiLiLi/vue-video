@@ -11,10 +11,11 @@
                 </el-input>
                 </div>
                 <!-- 查询用户按钮 -->
-                <el-button type="primary" @click="queryName">查询</el-button>
+                <div class="demo-input-suffix">
+                    <el-button type="primary" @click="queryName">查询</el-button>
+                </div>
                 <!-- 增加用户按钮 -->
-                <div class="adduser-button">
-                <!-- <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button> -->
+                <div class="add-button">
                 <el-button type="primary" @click="addUserInfo">添加用户</el-button>
                 </div>
             </div>
@@ -35,9 +36,6 @@
                             <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
                             </el-form-item>
-                            <!-- <el-form-item label="用户 ID">
-                                <span>{{ props.row.user_id }}</span>
-                            </el-form-item> -->
                             <el-form-item label="联系方式">
                                 <span>{{ props.row.phone }}</span>
                             </el-form-item>
@@ -69,11 +67,6 @@
                     prop="name"
                     width="200">
                 </el-table-column>
-                <!-- <el-table-column
-                    label="用户 ID"
-                    prop="user_id"
-                    width="200">
-                </el-table-column> -->
                 <el-table-column
                   label="个性签名"
                   prop="personal_signature">
@@ -145,7 +138,9 @@
                                 <el-date-picker
                                     v-model="selectTable.birth"
                                     type="date"
-                                    placeholder="选择日期">
+                                    placeholder="选择日期"
+                                    format="yyyy 年 MM 月 dd 日"
+                                    value-format="yyyy-MM-dd">
                                 </el-date-picker>
                             </el-form-item>
                             <el-form-item label="个性签名" label-width="100px">
@@ -198,36 +193,10 @@
                     <el-form-item label="确认密码" prop="checkPass">
                         <el-input type="password" v-model="formData.checkPass" auto-complete="off"></el-input>
                     </el-form-item>
-                    <!-- action="https://jsonplaceholder.typicode.com/posts/"  路径 -->
-                    <!-- <el-form-item label="上传头像"> 
-                        <el-upload
-                            class="avatar-uploader"
-                            :action="baseUrl + '/v1/addimg/food'"
-                            :show-file-list="false"
-                            :on-success="handleServiceAvatarScucess"
-                            :before-upload="beforeAvatarUpload">
-                            <img v-if="selectTable.image_path" :src="baseImgPath + selectTable.image_path" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>  
-                    </el-form-item>
-                    <el-form-item label="性别">
-                        <el-radio-group v-model="formData.sex">
-                            <el-radio :label="3">男</el-radio>
-                            <el-radio :label="6">女</el-radio>
-                            <el-radio :label="9">保密</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="出生日期">
-                        <el-date-picker
-                            v-model="formData.birth"
-                            type="date"
-                            placeholder="选择日期">
-                        </el-date-picker>
-                    </el-form-item> -->
                    
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                        <el-button @click="resetForm('formData')">重置</el-button>
+                        <!-- <el-button @click="resetForm('formData')">重置</el-button> -->
                         <el-button @click="cancelAddUser('formData')">取 消</el-button>
                         <el-button type="primary" @click="submitAddUser(formData)">确 定</el-button>
                     </div>
@@ -367,7 +336,7 @@
                                 name: item.name,
                                 phone: item.phone,
                                 email: item.email,
-                                creat_time: item.creat_time,
+                                creat_time: item.creat_time.substring(0, 11),
                                 birth: item.birth,
                                 sex: item.sex,
                                 personal_signature: item.personal_signature,
@@ -442,9 +411,10 @@
                     return '保密'
                 }
             },
+            
             // 删除
             handleDelete(index, row){
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                this.$confirm('此操作将删除该用户, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -492,30 +462,33 @@
 
             // 更新数据
             updateUserInfo(selectTable){
-                // console.log(selectTable);
                 //数据缓存
-                const updateData= {};
-                updateData.index = selectTable.index;
-                updateData.user_id = selectTable.user_id;
-                updateData.name = selectTable.name;
-                updateData.avator = selectTable.avator;
-                updateData.birth = selectTable.birth;
-                updateData.phone = selectTable.phone;
-                updateData.email = selectTable.email;
-                updateData.sex = this.toTextSex(selectTable.sex);
-                updateData.personal_signature = selectTable.personal_signature;
-                               
+                const updateData= selectTable;
+                updateData.sex = this.toTextSex(selectTable.sex);                              
                 this.dialogFormVisible = false;
 
+                console.log(updateData)
                  //调用请求
-                // console.log(updateData);
-                // this.$forceUpdate();
+                
                 this.axios.post('http://localhost:8004/api/user/updateUserInfo',updateData)
                 .then(res => {
-                    this.tableData.splice(selectTable.index, 1, updateData)
+                    if(res.status ==200){
+                        const resData = res.data.user;
+                        resData.creat_time = res.data.user.creat_time.substring(0, 11);
+                        this.tableData.splice(selectTable.index, 1, resData);
+                        this.$message({
+                            showClose: true,
+                            message: res.data.msg,
+                            type: 'success'
+						});
+                    }      
                 })
                 .catch(e => {
-                    console.log(e);
+                    this.$message({
+                        showClose: true,
+                        message: res.data.msg,
+                        type: 'error'
+                    });
                 });
                 
                 
@@ -584,7 +557,7 @@
                                 name: item.name,
                                 phone: item.phone,
                                 email: item.email,
-                                creat_time: item.creat_time,
+                                creat_time: item.creat_time.substring(0, 11),
                                 birth: item.birth,
                                 sex: item.sex,
                                 personal_signature: item.personal_signature,
@@ -653,7 +626,7 @@
         width: 300px;
         display: inline-block;
     }
-    .adduser-button{
+    .add-button{
         // display: inline-block;
         margin-right: 200px;
         float: right;

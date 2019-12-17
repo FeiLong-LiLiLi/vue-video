@@ -11,9 +11,9 @@ const userList = r => require.ensure([], () => r(require('@/page/userList')), 'u
 // const userListNEW = r => require.ensure([], () => r(require('@/page/userListNEW')), 'userListNEW');
 const adminList = r => require.ensure([], () => r(require('@/page/adminList')), 'adminList');
 // const adminListNEW = r => require.ensure([], () => r(require('@/page/adminListNEW')), 'adminListNEW');
-const shopList = r => require.ensure([], () => r(require('@/page/shopList')), 'shopList');
-const foodList = r => require.ensure([], () => r(require('@/page/foodList')), 'foodList');
-const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
+// const shopList = r => require.ensure([], () => r(require('@/page/shopList')), 'shopList');
+// const foodList = r => require.ensure([], () => r(require('@/page/foodList')), 'foodList');
+// const orderList = r => require.ensure([], () => r(require('@/page/orderList')), 'orderList');
 const videoList = r => require.ensure([], () => r(require('@/page/videoList')), 'videoList');
 const messageList = r => require.ensure([], () => r(require('@/page/messageList')), 'messageList');
 
@@ -21,7 +21,7 @@ const messageList = r => require.ensure([], () => r(require('@/page/messageList'
 const userData = r => require.ensure([], () => r(require('@/page/userData')), 'userData');
 const adminData = r => require.ensure([], () => r(require('@/page/adminData')), 'adminData');
 const videoData = r => require.ensure([], () => r(require('@/page/videoData')), 'videoData');
-const uploadImg = r => require.ensure([], () => r(require('@/page/uploadImg')), 'uploadImg');
+// const uploadImg = r => require.ensure([], () => r(require('@/page/uploadImg')), 'uploadImg');
 const vueEdit = r => require.ensure([], () => r(require('@/page/vueEdit')), 'vueEdit');
 const adminSet = r => require.ensure([], () => r(require('@/page/adminSet')), 'adminSet');
 // const adminPer = r => require.ensure([], () => r(require('@/page/adminPer')), 'adminPer');
@@ -36,18 +36,13 @@ const videoMonView = r => require.ensure([], () => r(require('@/page/videoMonVie
 const videoCategory = r => require.ensure([], () => r(require('@/page/videoCategory')), 'videoCategory');
 const videoTag = r => require.ensure([], () => r(require('@/page/videoTag')), 'videoTag');
 
-const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
+// const test = r => require.ensure([], () => r(require('@/page/test')), 'test');
 
 const routes = [
 	{
 		path: '/',
 		component: login
-	},
-	{
-		path: '/test',
-		component: test
-	},
-	{
+	},{
 		path: '/manage',
 		component: manage,
 		name: '',
@@ -59,18 +54,6 @@ const routes = [
 			path: '/userList',
 			component: userList,
 			meta: ['数据管理', '用户列表'],
-		},{
-			path: '/shopList',
-			component: shopList,
-			meta: ['数据管理', '商家列表'],
-		},{
-			path: '/foodList',
-			component: foodList,
-			meta: ['数据管理', '食品列表'],
-		},{
-			path: '/orderList',
-			component: orderList,
-			meta: ['数据管理', '订单列表'],
 		},{
 			path: '/adminList',
 			component: adminList,
@@ -119,10 +102,6 @@ const routes = [
 			path: '/videoTag',
 			component: videoTag,
 			meta: ['数据管理', '视频标签'],
-		},{
-			path: '/uploadImg',
-			component: uploadImg,
-			meta: ['文本编辑', 'MarkDown'],
 		},{
 			path: '/vueEdit',
 			component: vueEdit,

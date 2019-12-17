@@ -1,8 +1,13 @@
 <template>
 	<div class="manage_page fillcontain">
 		<el-row style="height: 100%;">
-	  		<el-col :span="4"  style="min-height: 100%; background-color: #324057;">
-				<el-menu :default-active="defaultActive" style="min-height: 100%;" theme="dark" router>
+			<!-- #409EFF 蓝色   #324057 灰色-->
+	  		<el-col :span="4"  style="min-height: 100%; background-color: #324057;">	
+				<el-menu :default-active="defaultActive"
+				class="el-menu-vertical-demo"
+				style="min-height: 100%;"
+				theme = 'dark'
+				router>
 					<el-menu-item index="manage"><i class="el-icon-menu"></i>首页
 					</el-menu-item>
 					<el-submenu index="1">
@@ -17,8 +22,6 @@
 						<el-menu-item index="/userData">用户数据</el-menu-item>
 						<el-menu-item index="/adminData">管理员数据</el-menu-item>
 						<el-menu-item index="/videoData">视频数据</el-menu-item>
-						<!-- <el-menu-item index="#">评论数据</el-menu-item> -->
-						<!-- <el-menu-item index="newMember">用户数据</el-menu-item> -->
 					</el-submenu>
 					<el-submenu index="3">
 						<template slot="title"><i class="el-icon-view"></i>实时监控</template>
@@ -32,9 +35,7 @@
 					</el-submenu>
 					<el-submenu index="5">
 						<template slot="title"><i class="el-icon-setting"></i>个人中心</template>
-						<!-- <el-menu-item index="adminSet">管理员信息</el-menu-item> -->
 						<el-menu-item index="/adminSet">个人信息</el-menu-item>
-						<!-- <el-menu-item index="adminper">我的权限</el-menu-item> -->
 						<el-menu-item index="/sendMessage">我的权限</el-menu-item>
 					</el-submenu>
 					<el-submenu index="6">

@@ -7,13 +7,13 @@
 		  		</div>
 		    	<el-form :model="loginForm" :rules="rules" ref="loginForm">
 					<el-form-item prop="username">
-						<el-input v-model="loginForm.username" placeholder="用户名"><span>dsfsf</span></el-input>
+						<el-input v-model="loginForm.email" placeholder="邮箱"><span>dsfsf</span></el-input>
 					</el-form-item>
 					<el-form-item prop="password">
-						<el-input type="password" placeholder="密码" v-model="loginForm.password"></el-input>
+						<el-input type="password" placeholder="密码" v-model="loginForm.psw"></el-input>
 					</el-form-item>
 					<el-form-item>
-				    	<el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登陆</el-button>
+				    	<el-button type="primary" @click="submitForm(loginForm)" class="submit_btn">登陆</el-button>
 				  	</el-form-item>
 				</el-form>
 				<!-- <p class="tip">温馨提示：</p>
@@ -25,23 +25,23 @@
 </template>
 
 <script>
-	import {login, getAdminInfo} from '@/api/getData'
+	// import {login, getAdminInfo} from '@/api/getData'
 	import {mapActions, mapState} from 'vuex'
 
 	export default {
 	    data(){
 			return {
 				loginForm: {
-					username: '',
-					password: '',
+					email: '',
+					psw: '',
 				},
 				rules: {
-					username: [
-			            { required: true, message: '请输入用户名', trigger: 'blur' },
-			        ],
-					password: [
-						{ required: true, message: '请输入密码', trigger: 'blur' }
-					],
+					// username: [
+			        //     { required: true, message: '请输入邮箱', trigger: 'blur' },
+			        // ],
+					// password: [
+					// 	{ required: true, message: '请输入密码', trigger: 'blur' }
+					// ],
 				},
 				showLogin: false,
 			}
@@ -58,8 +58,45 @@
 		methods: {
 			...mapActions(['getAdminData']),
 			async submitForm(formName) {
-				this.$refs[formName].validate(async (valid) => {
-					this.$router.push('manage')
+				// console.log(formName.email)
+				if(formName.email != '' && formName.psw != ''){
+					const params = formName;
+					this.axios.post('http://localhost:8004/api/admins/login',params)
+					.then(res =>{
+						// console.log(res)
+						// console.log(res.data)
+						if(res.status == 200){
+							if(res.data.success == false){
+								// console.log(res.data.msg)
+								this.$message({
+									showClose: true,
+									message: res.data.msg,
+									type: 'warning'
+								});
+							}else{
+								this.$message({
+									showClose: true,
+									message: res.data.msg,
+									type: 'success'
+								});
+								this.$router.push('manage');
+							}
+						}
+					}).catch(err =>{
+						console.log(err)
+					})
+				}else{
+					this.$message({
+						showClose: true,
+						message: '请输入正确的账号和密码',
+						type: 'error'
+					});
+					return false;
+				}
+				
+				// console.log(this.$refs[formName]);
+				// this.$refs[formName].validate(async (valid) => {
+				// 	this.$router.push('manage')
 					//判断登陆
 					// if (valid) {
 					// 	const res = await login({user_name: this.loginForm.username, password: this.loginForm.password})
@@ -83,7 +120,7 @@
 					// 	});
 					// 	return false;
 					// }
-				});
+				// });
 			},
 		},
 		watch: {
