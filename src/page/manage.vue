@@ -15,7 +15,7 @@
 						<el-menu-item index="/userList">用户列表</el-menu-item>	
 						<el-menu-item index="/adminList">管理员列表</el-menu-item>	
 						<el-menu-item index="/videoList">视频列表</el-menu-item>	
-						<el-menu-item index="/messageList">通知列表</el-menu-item>				
+						<!-- <el-menu-item index="/messageList">通知列表</el-menu-item>				 -->
 					</el-submenu>
 					<el-submenu index="2">
 						<template slot="title"><i class="el-icon-star-on"></i>数据统计</template>
@@ -36,7 +36,7 @@
 					<el-submenu index="5">
 						<template slot="title"><i class="el-icon-setting"></i>个人中心</template>
 						<el-menu-item index="/adminSet">个人信息</el-menu-item>
-						<el-menu-item index="/sendMessage">我的权限</el-menu-item>
+						<!-- <el-menu-item index="/sendMessage">我的权限</el-menu-item> -->
 					</el-submenu>
 					<el-submenu index="6">
 						<template slot="title"><i class="el-icon-warning"></i>说明</template>

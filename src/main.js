@@ -5,6 +5,7 @@ import store from './store/'
 import ElementUI from 'element-ui'
 import	axios from 'axios'
 import 'element-ui/lib/theme-default/index.css'
+import 'default-passive-events'
 
 Vue.config.productionTip = false;
 
@@ -26,13 +27,5 @@ new Vue({
 	template: '<App/>',
 	components: { App }
 })
-// axios.all('*', function(req, res, next) {
-// 	res.header("Access-Control-Allow-Origin", "*");
-// 	res.header("Access-Control-Allow-Headers", "X-Requested-With");
-// 	// res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-// 	res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-// 	res.header("X-Powered-By",' 3.2.1');
-// 	res.header("Content-Type", "application/json;charset=utf-8");
-// 	next();
-//   });
+
   

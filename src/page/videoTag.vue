@@ -28,7 +28,7 @@
 
 <script>
     import headTop from '../components/headTop'
-    
+    import {getAllTags, addTag, delTag, queryTags} from '@/api/getData'
 
     export default {
         data(){
@@ -46,18 +46,24 @@
         },
         methods: {
             async initData(){
-                this.axios.get('http://localhost:8004/api/tags/get')
-                .then(res => {
-                    // console.log(res.data)
+                try {
+                    const res = await getAllTags();
                     if(res.status == 200){
                         if(res.data.success == true){
                             res.data.tags.forEach(item => {
-                                // console.log(item.value)
                                 this.dynamicTags.push(item.value)
+                            });
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                type: 'info',
+                                message: res.data.msg
                             });
                         }
                     }
-                })
+                } catch (error) {
+                    console.log(error);
+                }
             },
             async handleClose(tag) {
 
@@ -65,27 +71,31 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then(() => {
-                    this.axios.get('http://localhost:8004/api/tags/del',{
-                        params: {tag: tag}
-                    }).then(res => {
+                }).then(async() => {
+                    try {
+                        const res =  await delTag(tag);
                         if(res.status == 200){
                             if(res.data.success == true){
-                                this.$message({
-                                type: 'success',
-                                message: '删除成功!'
-                                });
                                 this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+                                this.$message({
+                                    showClose: true,
+                                    type: 'success',
+                                    message: res.data.msg
+                                });
                             }else{
                                 this.$message({
-                                type: 'success',
-                                message: '删除失败!'
+                                    showClose: true,
+                                    type: 'error',
+                                    message: res.data.msg
                                 });
                             }
                         }
-                    })
+                    } catch (error) {
+                        console.log(error);
+                    }
                 }).catch(() => {
                     this.$message({
+                        showClose: true,
                         type: 'info',
                         message: '已取消删除'
                     });          
@@ -102,28 +112,29 @@
 
             async handleInputConfirm() {
                 let inputValue = this.inputValue;
-                const params = {tag: inputValue}
-                console.log(params)
                 if (inputValue) {
-                    this.axios.post('http://localhost:8004/api/tags/add',params)
-                    .then(res => {
-                        console.log(res);
-                        if(res.status ==200){
+                    try {
+                        const params = {tag: inputValue}
+                        const res = await addTag(params)
+                        if(res.status == 200){
                             if(res.data.success == true){
-                                this.$message({
-                                type: 'success',
-                                message: '添加成功!'
-                                });
                                 this.dynamicTags.push(inputValue);
+                                this.$message({
+                                    showClose: true,
+                                    type: 'success',
+                                    message: res.data.msg
+                                });
                             }else{
                                 this.$message({
-                                type: 'success',
-                                message: '已重复或其他原因，添加失败!'
+                                    showClose: true,
+                                    type: 'error',
+                                    message: res.data.msg
                                 });
                             }
                         }
-                        
-                    })
+                    } catch (error) {
+                        console.log(error);
+                    }
                 }
                 this.inputVisible = false;
                 this.inputValue = '';

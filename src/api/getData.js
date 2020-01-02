@@ -1,5 +1,5 @@
 // import fetch from '@/config/fetch'
-// // import axios from '@/config/axios'
+import axios from 'axios'
 
 // /**
 //  * 登陆
@@ -18,8 +18,10 @@
 //  */
 
 // export const getAdminInfo = () => fetch('/admin/info');
+// export const getAdminInfo = () => fetch('Http://localhost:8004/api/admin/adminInfo')
 
-// /**
+
+// export module = getAdminInfo;
 //  * api请求量
 //  */
 
@@ -235,7 +237,207 @@
 //  */
 
 
-// // this.axios.get('http://localhost:8004/api/videoInfo').then(res => {this.data = res;})
 
-// // export const getVideoInfo = () => fetch('http://localhost:8004/api/videoInfo');
-// export const getVideoInfo = () => this.axios.get('http://localhost:8004/api/videoInfo').then(res => {return res})
+/**
+ * 登录
+ */
+
+export const login = data => axios.post('http://localhost:8004/api/admins/login' ,data);
+
+/**
+ *退出 
+ */
+
+export const logout = data => axios.post();
+
+/**
+ * 获取用户数量
+ */
+
+export const getUsersCount = () => axios.get('http://localhost:8004/api/user/usersInfo/count');
+
+/**
+ * 获取用户信息
+ */
+
+export const getAllUsers = data => axios.get('http://localhost:8004/api/user/usersInfo/all',{params: {page: data.page, num: data.num}});
+
+/**
+ * 增加/注册用户
+ */
+
+export const addUser = data => axios.post('http://localhost:8004/api/users/register', data);
+
+/**
+ * 删除用户
+ */
+
+export const delUser = id => axios.get('http://localhost:8004/api/user/delUser', {params:{user_id: id}});
+
+/**
+ * 更新用户
+ */
+
+export const updateUser = data => axios.post('http://localhost:8004/api/user/updateUserInfo', data)
+
+/**
+ * 查询用户数量
+ */
+
+export const queryUserCount = data => axios.post('http://localhost:8004/api/user/queryUser/count', data);
+
+/**
+ *获取查询用户的信息 
+ */
+
+export const queryUserAll = data => axios.get('http://localhost:8004/api/user/queryUser/all', {params: {name: data.name, page: data.page, num: data.num}});
+
+/* 
+* 获取用户性别
+*/
+
+export const getUserSex = () => axios.get('http://localhost:8004/api/user/usersInfo/sex');
+ 
+/*
+*获取管理员数量
+*/
+
+export const getAdminCount = () => axios.get('Http://localhost:8004/api/admin/adminInfo/count');
+
+/**
+ * 获取管理员信息
+ */
+
+export const getAllAdmins = data => axios.get('http://localhost:8004/api/admin/adminInfo/all',{params: {page: data.page, num: data.num}});
+
+/*
+ *添加管理员 
+ */
+
+export const addAdmin = data => axios.post('http://localhost:8004/api/admin/addAdmin', data);
+
+/*
+ *删除管理员 
+ */
+
+export const delAdmin = id => axios.get('http://localhost:8004/api/admin/delAdmin', {params:{admin_id: id}});
+
+/*
+*更新管理员
+*/
+
+export const updateAdmin = data => axios.post('http://localhost:8004/api/admin/updateAdmin', data);
+
+/**
+ * 获取被查询管理员数量
+ */
+
+export const queryAdminCount = data => axios.post('http://localhost:8004/api/admin/queryAdmin/count', data);
+
+/**
+ *获取被查询管理员信息 
+ */
+
+export const queryAdminAll = data => axios.get('http://localhost:8004/api/admin/queryAdmin/all', {params: {name: data.name, page: data.page, num: data.num}})
+
+/* 
+* 获取管理员性别
+*/
+
+export const getAdminSex = () => axios.get('http://localhost:8004/api/admin/adminInfo/sex');
+
+/**
+ * 获取视频数量
+ */
+
+export const getVideosCount = () => axios.get('http://localhost:8004/api/video/videoInfo/count');
+
+/**
+ * 获得所有视频源信息
+ */
+
+export const getAllVideos = data => axios.get('http://localhost:8004/api/video/videoInfo/all', {params: {page: data.page, num: data.num}});
+
+/**
+ * 增加视频
+ */
+
+export const addVideo = data => axios.post('http://localhost:8004/api/video/addVideo',data);
+
+/**
+ * 删除视频
+ */
+
+export const delVideo = id => axios.get('http://localhost:8004/api/video/delVideo',{params:{video_id: id}});
+
+/**
+ * 更新视频
+ */
+
+ export const updateVideo = data => axios.post('http://localhost:8004/api/video/updateVideo', data);
+
+ /**
+  * 获取被查询视频数量
+  */
+
+export const queryVideoCount = data => axios.post('http://localhost:8004/api/video/queryVideo/count', data);
+
+/**
+ * 获取被查询视频信息
+ */
+
+ export const queryVideoAll = data => axios.get('http://localhost:8004/api/video/queryVideo/all', {params: {name: data.name, page: data.page, num: data.num}})
+
+/**
+ * 获取所有视频类别数量
+ */
+
+export const getAllCategoriesNum = () => axios.get('http://localhost:8004/api/categories/num');
+
+/**
+ *获取类别信息 
+ */
+
+export const getAllCategories = () => axios.get('http://localhost:8004/api/categories/get');
+
+/**
+ * 添加视频类别
+ */
+
+export const addCategory = data => axios.post('http://localhost:8004/api/categories/add', data);
+
+/**
+ * 删除视频类别
+ */
+
+export const delCategory = category => axios.get('http://localhost:8004/api/categories/del', {params: {category: category}});
+
+/**
+ * 查询视频标签
+ */
+
+// export const queryCategories = data => axios.post();
+
+/**
+ * 获取标签信息
+ */
+
+export const getAllTags = () => axios.get('http://localhost:8004/api/tags/get');
+
+/**
+ * 添加视频标签
+ */
+
+export const addTag = data => axios.post('http://localhost:8004/api/tags/add', data);
+
+/**
+ * 删除视频标签
+ */
+
+export const delTag = tag => axios.get('http://localhost:8004/api/tags/del', {params: {tag: tag}});
+
+/**
+ * 查询视频标签
+ */
+
+// export const queryTags = data => axios.post();

@@ -11,7 +11,7 @@
                 </el-input>
                 </div>
                 <!-- 查询用户按钮 -->
-                <el-button type="primary" @click="queryKey(query_key)">查询</el-button>
+                <el-button type="primary" @click="queryKey">查询</el-button>
                 <!-- 增加用户按钮 -->
                 <div class="adduser-button">
                 <!-- <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button> -->
@@ -32,9 +32,9 @@
                             <el-form-item label="管理员名">
                                 <span>{{ props.row.name }}</span>
                             </el-form-item>
-                            <el-form-item label="头像">
+                            <!-- <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
-                            </el-form-item>
+                            </el-form-item> -->
                             <!-- <el-form-item label="管理员 ID">
                                 <span>{{ props.row.admin_id }}</span>
                             </el-form-item> -->
@@ -191,8 +191,8 @@
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                         <el-button @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button @click="cancelAddUser('ruleForm')">取 消</el-button>
-                        <el-button type="primary" @click="submitAddUser(ruleForm)">确 定</el-button>
+                        <el-button @click="cancelAddAdmin('ruleForm')">取 消</el-button>
+                        <el-button type="primary" @click="submitAddAdmin(ruleForm)">确 定</el-button>
                     </div>
             </el-dialog> 
             <!-- 弹窗添加用户结束 -->
@@ -205,7 +205,7 @@
     import headTop from '../components/headTop'
     
     import {baseUrl, baseImgPath} from '@/config/env'
-    // import {getFoods, getFoodsCount, getMenu, updateFood, deleteFood, getResturantDetail, getMenuById} from '@/api/getData'
+    import {getAdminCount, getAllAdmins, delAdmin, addAdmin, updateAdmin, queryAdminCount, queryAdminAll} from '@/api/getData'
     export default {
         data(){
             var checkAge = (rule, value, callback) => {
@@ -279,8 +279,8 @@
                 currentRow: null,
                 offset: 0,
                 currentPage: 1, 
-                limit: 20,
-                count: 200,
+                limit: 10,
+                count: 0,
 
                 
                 dialogFormVisible: false,   //编辑页面
@@ -335,8 +335,8 @@
             }
         },
         created(){
-        	// this.restaurant_id = this.$route.query.restaurant_id;
             this.initData();
+            // this.getAdmins();
         },
         computed: {
             // ...mapState(['adminInfo']),
@@ -358,30 +358,20 @@
     		headTop,
     	},
         methods: {
-             initData(){
-                this.axios.get('http://localhost:8004/api/admin/adminInfo')
-                .then(res => {
-                //    console.log(res); 
-                   if(res.status == 200){
-                       this.tableData = [];
-                       res.data.data.forEach(item => {
-                           const tableItem = {
-                                admin_id: item.admin_id,
-                                name: item.name,
-                                phone: item.phone,
-                                email: item.email,
-                                creat_time:item.creat_time.substring(0, 11),
-                                sex: item.sex,
-                                birth: item.birth,
-                                personal_signature: item.personal_signature,
-                           }
-                           this.tableData.push(tableItem);
-                       });
-                    }
-                })
-                .catch(e => {
-                    console.log(e);
-                })
+            async initData(){
+                try {
+                     const res = await getAdminCount();
+                    if(res.status == 200 ){
+                        if(res.data.success == true){
+                            this.count = res.data.total;
+                            this.getAdmins();
+                        }else{
+                            console.log('获取信息失败' + res.data)
+                        }
+                    }     
+                } catch (error) {
+                    console.log(error)
+                } 
             },
                         //性别问题
             toNumSex(sex){
@@ -410,9 +400,40 @@
             handleCurrentChange(val) {
                 this.currentPage = val;
                 this.offset = (val - 1)*this.limit;
-                // this.getFoods()
+                if(this.query_key != ''){
+                    this.queryAdmin();
+                }else{
+                     this.getAdmins();
+                } 
             },
 
+            //获取管理员
+            async getAdmins(){
+                const params = {};
+                params.page = this.currentPage-1;
+                params.num = this.limit;
+                try {
+                    const res = await getAllAdmins(params);
+                    // console.log(res);
+                    this.tableData = [];
+                    res.data.admins.forEach(item => {
+                        const tableItem = {
+                            admin_id: item.admin_id,
+                            name: item.name,
+                            phone: item.phone,
+                            email: item.email,
+                            creat_time:item.creat_time.substring(0, 11),
+                            sex: item.sex,
+                            birth: item.birth,
+                            personal_signature: item.personal_signature,
+                        }
+                        this.tableData.push(tableItem);
+                    });
+
+                } catch (error) {
+                    console.log(error);
+                }
+            },
             expand(row, status){
             	if (status) {
             		// this.getSelectItemData(row)
@@ -441,15 +462,15 @@
                 this.dialogFormVisible = true;
             },
 
-            updateSubmit(formName){
+            //更新
+            async updateSubmit(formName){     
                 const params = formName;
                 params.sex = this.toTextSex(formName.sex);
-                // console.log(params)
                 this.dialogFormVisible = false;
-                this.axios.post('http://localhost:8004/api/admin/updateAdmin',params)
-                .then(res => {
-                        // console.log(res);
-                     if(res.status ==200){
+                try {
+                    const res = await updateAdmin(params);
+                    // console.log(res);
+                    if(res.status == 200 && res.data.success == true){
                         const resData = res.data.admin;
                         resData.creat_time = res.data.admin.creat_time.substring(0, 11);
                         this.tableData.splice(params.index, 1, resData);
@@ -458,32 +479,43 @@
                             message: res.data.msg,
                             type: 'success'
                         });
+                    }else{
+                        this.$message({
+                            showClose: true,
+                            message: '存在错误',
+                            type: 'error'
+                        });
                     }
-                }) 
-                .catch(e => {
-                    console.log(e)
-                })
+                } catch (error) {
+                    console.log(error);
+                }
             },
 
             // 删除
-            handleDelete(index, row){
+            async handleDelete(index, row){
                 const admin_id = row.admin_id;
                 this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                    }).then(() => {
-                        this.axios.get('http://localhost:8004/api/admin/delAdmin',{
-                            params:{admin_id: admin_id}}
-                        ).then(res => {
-                            this.tableData.splice(index, 1)
+                    }).then(async() => {
+                        try {  
+                            // console.log(res);
+                            const res = await delAdmin(admin_id);
+                            if(res.data.success == true){
+                                this.tableData.splice(index, 1)
+                                this.$message({
+                                    type: 'success',
+                                    message: '删除成功!'
+                                });
+                                this.initData();      
+                            } 
+                        } catch (error) {
                             this.$message({
-                                type: 'success',
-                                message: '删除成功!'
+                                type: 'error',
+                                message: '删除失败!'
                             });
-                        }).catch(e => {
-                          console.log(e);  
-                        })
+                        }
                     }).catch(() => {
                         this.$message({
                             type: 'info',
@@ -535,70 +567,109 @@
             },
             // 重置添加
             resetForm(formName) { 
-                // console.log(formName);
-                // resetFields();    
+              
                 this.$refs[formName].resetFields();   
             },
             // 取消添加用户
-            cancelAddUser(formName){
-                // this.resetForm(formName);
+            cancelAddAdmin(formName){
+               
                 this.dialogFormVisible_add = false; 
-                console.log("取消");
+                // console.log("取消");
             },
             
             //提交添加用户
-            submitAddUser(formName) {
-                console.log(formName);
+            async submitAddAdmin(formName) {
+                // console.log(formName);
                 const params = formName;
-                params.psw =formName.checkPass;
-                // params.sex = this.toTextSex(formName.sex);
-                // params.personal_signature = formName.admin_id;
-               
-                this.axios.post('http://localhost:8004/api/admin/addAdmin', params)
-                .then(res => {
-                    console.log(res)
-                    if(res.status == 200){
-                        console.log('添加成功');
+                params.psw = formName.checkPass;
+                try {
+                    // console.log(params)
+                    const res = await addAdmin(params);
+                    // console.log(res);
+                    if(res.data.success == true){
                         this.dialogFormVisible_add = false;
                         this.tableData.push(res.data.data);
+                        this.$message({
+                                type: 'success',
+                                message: '添加成功!'
+                        });
+                        this.initData();
                     }else{
-                        console.log('添加失败');
                         this.dialogFormVisible_add = false;
-                    }       
-                })
-                .catch(e => {
-                    console.log(e)
-                })               
+                        this.$message({
+                            type: 'error',
+                            message: '添加失败!'
+                        });
+                    } 
+                } catch (error) {
+                    console.log(error);
+                    this.dialogFormVisible_add = false;
+                    this.$message({
+                        type: 'error',
+                        message: '添加失败!'
+                    });
+                }            
             },
 
-            queryKey(key){
+            async queryKey(){
                 const params = {};
-                params.name = key;
-                this.axios.post('http://localhost:8004/api/admin/queryAdmin',params)
-                .then(res => {
-                    //  console.log(res);
-                     if(res.status == 200){
-                         this.tableData = [];
-                         res.data.data.forEach(item => {
-                             const tableItem = {
-                                 admin_id: item.admin_id,
-                                 name: item.name,
-                                 phone: item.email,
-                                 email: item.email,
-                                 creat_time: item.creat_time.substring(0, 11),
-                                 sex: item.sex,
-                                 birth: item.birth,
-                                 personal_signature: item.personal_signature,
-                             }
-                             this.tableData.push(tableItem);
-                         })
-                     }
-                })
-                .catch(e => {
-                    console.log(e);
-                })
-            }
-            
+                params.name = this.query_key;
+                try {
+                    if(this.search_user != ''){
+                        this.currentPage = 0;
+                        const res = await queryAdminCount(params);
+                        // console.log(res);
+                        if(res.status == 200){
+                            if(res.data.success == true){
+                                this.count = res.data.total;
+                                this.queryAdmin();
+                            }else{
+                                console.log(res.data.msg)
+                            }
+                        }
+                    }else{
+                        this.initData();  //数据
+                        this.getUsers();  //用户
+                    }   
+                } catch (error) {
+                    console.log(error);
+                     this.$message({
+                        type: 'error',
+                        message: '查询错误!'
+                    });
+                }
+            },
+
+            //获取被查询管理员信息
+            async queryAdmin(){
+                const params = {};
+                params.name = this.query_key;
+                params.page = this.currentPage-1;
+                params.num = this.limit;
+                try {
+                    const res = await queryAdminAll(params);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.admins.forEach(item => {
+                                const tableItem = {
+                                    admin_id: item.admin_id,
+                                    name: item.name,
+                                    phone: item.email,
+                                    email: item.email,
+                                    creat_time: item.creat_time.substring(0, 11),
+                                    sex: item.sex,
+                                    birth: item.birth,
+                                    personal_signature: item.personal_signature,
+                                }
+                                this.tableData.push(tableItem);
+                            })
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } 
         },
     }
 </script>

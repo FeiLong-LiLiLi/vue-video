@@ -16,7 +16,7 @@
             this.myChart = echarts.init(document.getElementById('user_sex_pie'));
             this.initData();
         },
-        props: ['userSexData'],
+        props: ['sexData'],
         methods: {
             initData(){
                 const option = {
@@ -41,9 +41,9 @@
                             radius : '55%',
                             center: ['50%', '60%'],
                             data:[
-                                {value: 1111, name:'男'},
-                                {value: 2222, name:'女'},
-                                {value: 4444, name:'保密'},
+                                {value: this.sexData.male, name:'男'},
+                                {value: this.sexData.female, name:'女'},
+                                {value: this.sexData.secrecy, name:'保密'},
                                 
                             ],
                             itemStyle: {
@@ -61,7 +61,7 @@
             }
         },
         watch: {
-            userSexData: function (){
+            sexData: function (){
                 this.initData()
             }
         }
@@ -73,8 +73,8 @@
     .user-sex-pie{
         width: 400px;
         height: 400px;
-        // display: flex;
-        // justify-content: center;
+        display: flex;
+        justify-content: center;
         // margin: 20px;
         // float: left;
     }

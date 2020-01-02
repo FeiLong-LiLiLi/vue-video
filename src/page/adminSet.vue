@@ -191,14 +191,16 @@
         padding-right: 20px;
     }
     .el-input{
-        width: 325px;
+        width: 300px;
+        // display: inline;
+        display: inline-block;
     }
     .el-date-editor.el-input {
-    width: 325px;
+    width: 300px;
     }
 
     .el-textarea{
-        width: 325px;
+        width: 300px;
         // margin-top: 20px;
     }
     

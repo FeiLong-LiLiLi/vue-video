@@ -3,10 +3,11 @@
         <headTop></headTop>
         <div class="page-title">视频数据</div>
         <div>
-            <!-- <test :userSexData="pieData"></test> -->
-            <!-- <test></test> -->
-            <div class="type"><videoType></videoType></div>
-            <div class="category"><videoActionCategory></videoActionCategory></div>
+            <div class="type">
+                <videoType :typeData='pieData'></videoType>
+            </div>
+
+            <!-- <div class="category"><videoActionCategory></videoActionCategory></div> -->
             
         </div>
     </div>
@@ -17,14 +18,17 @@
     import test from '../components/test'
     import videoType from '../components/videoType'
     import videoActionCategory from '../components/videoActionCategory'
-    
+    import {getAllCategoriesNum} from '@/api/getData'
 
     export default {
         data(){
             return{
-            pieData: {}
+                pieData: {}
 
             }
+        },
+        created(){
+            this.initCategoriesNum();
         },
         components:{
             headTop,
@@ -33,23 +37,39 @@
             videoActionCategory,
 
         },
-        // mounted(){
-    	// 	this.initData();
-    	// },
-    	// methods: {
-    	// 	async initData(){
-    	// 		try{
-    	// 			const res = await getUserCity();
-    	// 			if (res.status == 1) {
-    	// 				this.pieData = res.user_city;
-    	// 			}else{
-    	// 				throw new Error(res)
-    	// 			}
-    	// 		}catch(err){
-    	// 			console.log('获取用户分布信息失败',err);
-    	// 		}
-    	// 	},
-    	// }
+        mounted(){
+    		//  this.initCategoriesNum();
+        },
+        watch: {
+            $route(to,from){
+                // console.log(to)
+                // console.log(to.path);
+                if(to.path === '/videoData'){  
+                    this.initCategoriesNum();
+                }
+            }
+         },
+    	methods: {
+    		async initCategoriesNum(){
+                try {
+                    const res = await getAllCategoriesNum();
+                    // console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            // this.pieData = {};
+                            this.pieData = res.data.allCategoriesNum;
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            
+            async test(){
+                alert('test');
+                console.log(test);
+            }
+    	}
 
 }
 </script>
@@ -65,5 +85,5 @@
         padding: 20px;
         
     }
-
+     *{ touch-action: pan-y; }
 </style>

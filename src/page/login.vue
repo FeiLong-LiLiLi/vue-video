@@ -25,7 +25,7 @@
 </template>
 
 <script>
-	// import {login, getAdminInfo} from '@/api/getData'
+	import {login, getAdminInfo} from '@/api/getData'
 	import {mapActions, mapState} from 'vuex'
 
 	export default {
@@ -61,30 +61,26 @@
 				// console.log(formName.email)
 				if(formName.email != '' && formName.psw != ''){
 					const params = formName;
-					this.axios.post('http://localhost:8004/api/admins/login',params)
-					.then(res =>{
-						// console.log(res)
-						// console.log(res.data)
-						if(res.status == 200){
-							if(res.data.success == false){
-								// console.log(res.data.msg)
-								this.$message({
-									showClose: true,
-									message: res.data.msg,
-									type: 'warning'
-								});
-							}else{
-								this.$message({
-									showClose: true,
-									message: res.data.msg,
-									type: 'success'
-								});
-								this.$router.push('manage');
-							}
+					try {
+						const res = await login(params);
+						// console.log(res);
+						if(res.status == 200 && res.data.success == true){
+							this.$message({
+								showClose: true,
+								message: res.data.msg,
+								type: 'success'
+							});
+							this.$router.push('manage');
+						}else{
+							this.$message({
+								showClose: true,
+								message: res.data.msg,
+								type: 'warning'
+							});
 						}
-					}).catch(err =>{
-						console.log(err)
-					})
+					} catch (error) {
+						console.log(error);
+					}
 				}else{
 					this.$message({
 						showClose: true,

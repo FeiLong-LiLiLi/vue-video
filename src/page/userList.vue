@@ -33,9 +33,9 @@
                             <el-form-item label="用户名">
                                 <span>{{ props.row.name }}</span>
                             </el-form-item>
-                            <el-form-item label="头像">
+                            <!-- <el-form-item label="头像">
                                 <span>{{ props.row.avater }}</span>
-                            </el-form-item>
+                            </el-form-item> -->
                             <el-form-item label="联系方式">
                                 <span>{{ props.row.phone }}</span>
                             </el-form-item>
@@ -57,14 +57,19 @@
                         </el-form>
                     </template>
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                     label="序号"
                     type="index"
                     width="100">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                     label="用户名称"
                     prop="name"
+                    width="200">
+                </el-table-column>
+                <el-table-column
+                    label="电子邮箱"
+                    prop="email"
                     width="200">
                 </el-table-column>
                 <el-table-column
@@ -175,9 +180,6 @@
                      @expand='expand'
                     :expand-row-keys='expendRow'
                     :row-key="row => row.index">
-                    <!-- <el-form-item label="测试ID" prop="user_id">
-                        <el-input v-model="formData.user_id"></el-input>
-                    </el-form-item>  -->
                     <el-form-item label="用户名" prop="name">
                         <el-input v-model="formData.name"></el-input>
                     </el-form-item> 
@@ -210,7 +212,7 @@
 <script>
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
-    // import {getFoods, getFoodsCount, getMenu, updateFood, deleteFood, getResturantDetail, getMenuById} from '@/api/getData'
+    import {getUsersCount, getAllUsers, addUser, delUser, updateUser, queryUserCount, queryUserAll} from '@/api/getData'
     export default {
         data(){
             var checkAge = (rule, value, callback) => {
@@ -258,8 +260,8 @@
                 currentRow: null,
                 offset: 0,
                 currentPage: 1, 
-                limit: 20,
-                count: 200,
+                limit: 10,
+                count: 0,
 
                 
                 dialogFormVisible: false,   //编辑页面
@@ -312,7 +314,11 @@
             }
         },
         created(){
-            this.initData();   	
+            this.initData();  //数据
+            this.getUsers();  //用户   	
+        },
+        watch: {
+            
         },
         computed: {
             // ...mapState(['adminInfo'])
@@ -323,33 +329,19 @@
     	},
         methods: {
             //初始化数据
-            initData(){
-                this.axios.get('http://localhost:8004/api/user/usersInfo')
-                .then(res => {
-                    // console.log(res);
-                    if(res.status == 200){
-                        this.tableData = [];
-
-                        res.data.data.forEach(item =>{
-                            const tableItem = {
-                                user_id: item.user_id,
-                                name: item.name,
-                                phone: item.phone,
-                                email: item.email,
-                                creat_time: item.creat_time.substring(0, 11),
-                                birth: item.birth,
-                                sex: item.sex,
-                                personal_signature: item.personal_signature,
-                            }
-                            this.tableData.push(tableItem)
-                        })
-                    }else{
-                        console.log('错误');
+            async initData(){
+                try {
+                    const res = await getUsersCount()
+                    if(res.status ==200){
+                        if(res.data.success == true){  
+                            this.count = res.data.total; 
+                        }else{
+                            console.log('获取用户数量失败')
+                        }
                     }
-                })
-                .catch(e => {
-                    console.log(e);
-                })
+                } catch (error) {
+                    console.log(error);
+                }
 
             },
             
@@ -360,9 +352,42 @@
             handleCurrentChange(val) {
                 this.currentPage = val;
                 this.offset = (val - 1)*this.limit;
-                // this.getFoods()
+                if(this.search_user != ''){
+                    this.queryUser();
+                }else{
+                    this.getUsers();
+                }
             },
-
+            async getUsers(){
+                const params = {};
+                params.page = this.currentPage-1;
+                params.num = this.limit;
+                try {
+                    const res = await getAllUsers(params);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.users.forEach(item =>{
+                                const tableItem = {
+                                    user_id: item.user_id,
+                                    name: item.name,
+                                    phone: item.phone,
+                                    email: item.email,
+                                    creat_time: item.creat_time.substring(0, 11),
+                                    birth: item.birth,
+                                    sex: item.sex,
+                                    personal_signature: item.personal_signature,
+                                }
+                                this.tableData.push(tableItem)
+                            })
+                        }else{
+                            console.log(res.data.msg)
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
             expand(row, status){
             	if (status) {
             		// this.getSelectItemData(row)
@@ -413,23 +438,33 @@
             },
             
             // 删除
-            handleDelete(index, row){
+            async handleDelete(index, row){
                 this.$confirm('此操作将删除该用户, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                    }).then(() => {
-                        this.axios.get('http://localhost:8004/api/user/delUser',{
-                            params: {user_id: row.user_id}
-                        }).then(res => {
-                            this.tableData.splice(index,1)
-                            this.$message({
-                                type: 'success',
-                                message: '删除成功!'
-                            }); 
-                        }).catch(e => {
-                            console.log(e)
-                        });    
+                    }).then( async() => {
+                        try {
+                            const res = await delUser(row.user_id)
+                            console.log(res);
+                            if(res.status == 200){
+                                if(res.data.success == true){
+                                    this.tableData.splice(index,1)
+                                    this.$message({
+                                        type: 'success',
+                                        message: '删除成功!'
+                                    });
+                                    this.initData();
+                                }else{
+                                    this.$message({
+                                        type: 'error',
+                                        message: '删除失败!'
+                                    }); 
+                                }
+                            }
+                        } catch (error) {
+                            console.log(error)
+                        }    
                     }).catch(() => {
                         this.$message({
                             type: 'info',
@@ -461,35 +496,35 @@
 
 
             // 更新数据
-            updateUserInfo(selectTable){
-                //数据缓存
-                const updateData= selectTable;
-                updateData.sex = this.toTextSex(selectTable.sex);                              
+            async updateUserInfo(selectTable){
+                const params= selectTable;
+                params.sex = this.toTextSex(selectTable.sex);                              
                 this.dialogFormVisible = false;
-
-                console.log(updateData)
-                 //调用请求
-                
-                this.axios.post('http://localhost:8004/api/user/updateUserInfo',updateData)
-                .then(res => {
-                    if(res.status ==200){
-                        const resData = res.data.user;
-                        resData.creat_time = res.data.user.creat_time.substring(0, 11);
-                        this.tableData.splice(selectTable.index, 1, resData);
-                        this.$message({
-                            showClose: true,
-                            message: res.data.msg,
-                            type: 'success'
-						});
-                    }      
-                })
-                .catch(e => {
-                    this.$message({
-                        showClose: true,
-                        message: res.data.msg,
-                        type: 'error'
-                    });
-                });
+                try {
+                    const res = await updateUser(params)
+                    // console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            const resData = res.data.user;
+                            resData.creat_time = res.data.user.creat_time.substring(0, 11);
+                            this.tableData.splice(selectTable.index, 1, resData);
+                            this.$message({
+                                showClose: true,
+                                message: res.data.msg,
+                                type: 'success'
+                            });
+                           
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                message: res.data.msg,
+                                type: 'error'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
                 
                 
             },
@@ -497,7 +532,7 @@
             handleClose(done,formName) {
                 this.$confirm('是否保存数据？')
                 .then(_ => {
-                    // this.$refs[formName].resetFields();
+                    this.$refs[formName].resetFields();
                     done();
                 })
                 .catch(_ => {});
@@ -505,69 +540,108 @@
 
             // 增加
             addUserInfo(formName){
-                // alert("1111");
-                console.log("增加");
-                // this.resetForm(formName);
+               
+                console.log(formName);
+                // this.$refs[formName].resetFields();
                 this.dialogFormVisible_adduser = true;
             },
             // 重置添加
             resetForm(formName) { 
-                // console.log(formName);
-                // resetFields();    
+              
                 this.$refs[formName].resetFields();   
             },
             // 取消添加用户
             cancelAddUser(formName){
-                // this.resetForm(formName);
                 this.dialogFormVisible_adduser = false; 
                 console.log("取消");
             },
             
             //提交添加用户
-            submitAddUser(formData) {
-                // console.log(formData);
-                this.axios.post('http://localhost:8004/api/user/addUser',formData)
-                .then(res => {
-                    // console.log(res);
+            async submitAddUser(formData) {
+                const params = formData;
+                try {
+                    console.log(params)
+                    const res = await addUser(params);
+                    console.log(res);
                     if(res.status == 200){
-                        console.log("提交成功");
-                        this.dialogFormVisible_adduser = false;
-                        this.tableData.push(res.data.data);
-                    }else{
-                        console.log("提交失败");
-                        this.dialogFormVisible_adduser = false;
+                        if(res.data.success == true){   
+                                this.$message({
+                                    showClose: true,
+                                    message: res.data.msg,
+                                    type: 'success'
+                                });
+                                this.dialogFormVisible_adduser = false;   
+                                this.tableData.push(res.data.user); 
+                                this.initData();	 
+                        }else{
+                            this.$message({
+                                    showClose: true,
+                                    message: res.data.msg,
+                                    type: 'error'
+                                });
+                        }
                     }
-                })
-                .catch(e => {
-                    console.log(e);
-                })
+                } catch (error) {
+                    console.log(error)
+                }
             },
             
             //查询
-            queryName(){
-                const name = this.search_user
-                this.axios.post('http://localhost:8004/api/user/queryUser',{
-                    name: name,
-                }).then(res => {
-                    if(res.status == 200){
-                        this.tableData = [];
-                        res.data.data.forEach(item =>{
-                            const tableItem = {
-                                user_id: item.user_id,
-                                name: item.name,
-                                phone: item.phone,
-                                email: item.email,
-                                creat_time: item.creat_time.substring(0, 11),
-                                birth: item.birth,
-                                sex: item.sex,
-                                personal_signature: item.personal_signature,
+            async queryName(){
+                const params = {};
+                params.name = this.search_user;  
+                try { 
+                    if(this.search_user != ''){
+                        this.currentPage = 0;
+                        const res = await queryUserCount(params)
+                        // console.log(res);
+                        if(res.status == 200){
+                            if(res.data.success == true){
+                                this.count = res.data.total;
+                                this.queryUser();
+                            }else{
+                                console.log(res.data.msg)
                             }
-                            this.tableData.push(tableItem)
-                        })
+                        }
+                    }else{
+                        this.initData();  //数据
+                        this.getUsers();  //用户
                     }
-                }).catch(e => {
-                   console.log(e); 
-                })
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+
+            //被查询的用户信息
+            async queryUser(){
+                const params = {};
+                params.name = this.search_user;
+                params.page = this.currentPage -1;
+                params.num = this.limit;
+                try {
+                    const res = await queryUserAll(params);
+                    // console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.users.forEach(item =>{
+                                const tableItem = {
+                                    user_id: item.user_id,
+                                    name: item.name,
+                                    phone: item.phone,
+                                    email: item.email,
+                                    creat_time: item.creat_time.substring(0, 11),
+                                    birth: item.birth,
+                                    sex: item.sex,
+                                    personal_signature: item.personal_signature,
+                                }
+                                this.tableData.push(tableItem)
+                            }) 
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             }
             
         },

@@ -11,7 +11,7 @@
                 </el-input>
                 </div>
                 <!-- 查询视频按钮 -->
-                <el-button type="primary" @click="queryVideo(query_video)">查询</el-button>
+                <el-button type="primary" @click="queryVideo()">查询</el-button>
                 <!-- 增加视频按钮 -->
                 <div class="add-button">
                 <!-- <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button> -->
@@ -32,10 +32,10 @@
                             <el-form-item label="视频名称">
                                 <span>{{ props.row.name }}</span>
                             </el-form-item>
-                            <el-form-item label="视频封面">
+                            <!-- <el-form-item label="视频封面">
                                 <span>{{ props.row.avater }}</span>
                                 <img src="" alt="" class="video-cover">
-                            </el-form-item>
+                            </el-form-item> -->
                             <!-- <el-form-item label="视频 ID">
                                 <span>{{ props.row.video_id }}</span>
                             </el-form-item> -->
@@ -60,21 +60,21 @@
                         </el-form>
                     </template>
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                     label="序号"
                     type="index"
                     width="100">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                     label="视频名称"
                     prop="name"
                     width="200">
                 </el-table-column>
-                <!-- <el-table-column
-                    label="视频 ID"
-                    prop="video_id"
+                <el-table-column
+                    label="视频类别"
+                    prop="category"
                     width="200">
-                </el-table-column> -->
+                </el-table-column>
                 <el-table-column
                   label="视频简介"
                   prop="video_desc">
@@ -265,9 +265,8 @@
 
 <script>
     import headTop from '../components/headTop'
-    
     import {baseUrl, baseImgPath} from '@/config/env'
-    // import {getFoods, getFoodsCount, getMenu, updateFood, deleteFood, getResturantDetail, getMenuById} from '@/api/getData'
+    import {getVideosCount, getAllVideos, addVideo, delVideo, updateVideo, queryVideoCount, queryVideoAll, getAllTags, getAllCategories} from '@/api/getData'
     export default {
         data(){
             return {
@@ -286,8 +285,8 @@
                 currentRow: null,
                 offset: 0,
                 currentPage: 1, 
-                limit: 20,
-                count: 200,
+                limit: 10,
+                count: 0,
 
                 
                 dialogFormVisible: false,   //编辑页面
@@ -340,23 +339,112 @@
         },
         created(){
             this.initData();
-            this.initCategories();
-            this.initTags();
+            // this.getVideos();
+            // this.initCategories();
+            // this.initTags();
         },
         computed: {
             // ...mapState(['adminInfo']),
         },
     	components: {
     		headTop,
-    	},
+        },
+        watch:{
+
+        },
         methods: {    
             async initData(){
-                this.axios.get('http://localhost:8004/api/video/videoInfo')
-                .then(res => {
-                    // console.log(res);
+                try {
+                    const res = await getVideosCount();
                     if(res.status == 200){
-                        const tableData = [];
-                        res.data.video.forEach(item => {
+                        if(res.data.success == true){
+                            this.count = res.data.total;
+                            this.getVideos()
+
+                        }else{
+                            console.log(res.data.msg);
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            },            
+            //类别
+            async initCategories(){
+                try {
+                    const res = await getAllCategories();
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.choose_category = [];
+                            res.data.categories.forEach(item => {
+                                const tableItem = {
+                                    value: item.value,
+                                    label: item.label
+                                }
+                                this.choose_category.push(tableItem)
+                            })
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                type: 'info',
+                                message: res.data.msg
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }, 
+
+            //标签
+            async initTags(){
+                try {
+                    const res = await getAllTags();
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.choose_tag = [];
+                            res.data.tags.forEach(item => {
+                                const tableItem ={
+                                    value: item.value,
+                                    label: item.label
+                                }
+                                this.choose_tag.push(tableItem)
+                            })
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                type: 'info',
+                                message: res.data.msg
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+        
+            // 分页
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.offset = (val - 1)*this.limit;
+                if(this.query_video != ''){
+                    this.queryVideoInfo();
+                }else{
+                    this.getVideos();
+                }
+            },
+            async getVideos(){
+                const params = {};
+                params.page = this.currentPage-1;
+                params.num = this.limit;
+                try {
+                    const res = await getAllVideos(params);
+                    if(res.data.success == true){
+                        this.tableData = [];
+                        res.data.videos.forEach(item => {
                             const tableItem = {
                                 video_id: item.video_id,
                                 name: item.name,
@@ -370,52 +458,13 @@
                             }
                             this.tableData.push(tableItem);
                         });
+                    }else{
+                        console.log('获取信息失败。')
                     }
-                })
-                .catch(e => {
-                    console.log(e);
-                })
-            },
-            async initCategories(){
-                this.axios.get('http://localhost:8004/api/categories/get')
-                .then(res => {
-                    if(res.status == 200){
-                        // console.log(res.data.categories)
-                        const choose_category = [];
-                        res.data.categories.forEach(item => {
-                            const tableItem = {
-                                value: item.value,
-                                label: item.label
-                            }
-                            this.choose_category.push(tableItem)
-                        })
-                    }
-                })
-            }, 
-            async initTags(){
-                this.axios.get('http://localhost:8004/api/tags/get')
-                .then(res =>{
-                    if(res.status == 200){
-                        if(res.data.success == true){
-                            const choose_tag = [];
-                            res.data.tags.forEach(item => {
-                                const tableItem ={
-                                    value: item.value,
-                                    label: item.label
-                                }
-                                this.choose_tag.push(tableItem)
-                            })
-                        }
-                    }
-                })
-            },
-            // 分页
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
-            },
-            handleCurrentChange(val) {
-                this.currentPage = val;
-                this.offset = (val - 1)*this.limit;
+                    
+                } catch (error) {
+                    console.log(error);
+                }
             },
 
             expand(row, status){
@@ -426,8 +475,7 @@
                     this.expendRow.splice(index, 1)
                 }
             },
-
-
+            
             // 编辑
             handleEdit(index, row) {
                 // console.log("编辑");
@@ -447,7 +495,10 @@
 
                 // this.selectTable.tag = this.toArrTag(row.tag);
                 this.selectTable = selectTable;
+                this.initCategories();
+                this.initTags();
                 this.dialogFormVisible = true;
+                
             },
             
             //tag转换数组
@@ -461,24 +512,34 @@
 
 
             // 删除
-            handleDelete(index, row){
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            async handleDelete(index, row){
+                this.$confirm('此操作将永久删除该视频, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                    }).then(() => {
-                        this.axios.get('http://localhost:8004/api/video/delVideo',{
-                            params: {video_id: row.video_id,}
-                        }).then(res => {
-                            // console.log('删除');
-                            this.tableData.splice(index,1)
-                            this.$message({
-                                type: 'success',
-                                message: '删除成功!'
-                            });
-                        }).catch(e => {
-                          console.log(e)  
-                        });
+                    }).then(async() => {
+                        try {
+                            const res = await delVideo(row.video_id);
+                            if(res.status == 200){
+                                if(res.data.success == true){
+                                    this.tableData.splice(index,1)
+                                    this.$message({
+                                        showClose: true,
+                                        type: 'success',
+                                        message: res.data.msg
+                                    }); 
+                                    this.initData();
+                                }else{
+                                    this.$message({
+                                        showClose: true,
+                                        type: 'error',
+                                        message: res.data.msg
+                                    });
+                                }
+                            }
+                        } catch (error) {
+                            console.log(error);
+                        }
                     }).catch(() => {
                         this.$message({
                             type: 'info',
@@ -509,7 +570,7 @@
             },
 
             // 更新数据
-            submitUpdate(formName){
+            async submitUpdate(formName){
                 // console.log(formName);
                 this.dialogFormVisible = false;
                 const params = {};
@@ -522,22 +583,30 @@
                 }
                 params.tag = tag.slice(0, tag.length-1)
                 params.video_desc = formName.video_desc;
-                
-                this.axios.post('http://localhost:8004/api/video/updateVideo',params)
-                .then(res => {
-                    this.dialogFormVisible = false;
-                    const resData = params;
-                    resData.creat_time = res.data.video.creat_time;
-                    resData.modify_time = res.data.video.modify_time;
-                    resData.link = res.data.video.link
-                    this.tableData.splice(formName.index, 1, resData);
-                    // console.log(res);
-                    // console.log(formName.index)
-                    
-                })
-                .catch(e => {
-                    
-                })
+                try {
+                    const res = await updateVideo(params);;
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            params.creat_time = res.data.video.creat_time;
+                            params.modify_time = res.data.video.modify_time;
+                            params.link = res.data.video.link;
+                            this.tableData.splice(formName.index, 1, params);
+                            this.$message({
+                                showClose: true,
+                                type: 'success',
+                                message: res.data.msg
+                            });
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                type: 'error',
+                                message: res.data.msg
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             },
             
             //对话框关闭
@@ -591,92 +660,128 @@
 
             // 增加
             addVideo(formName){
-                // console.log("增加");
+                this.initCategories();
+                this.initTags();
                 this.dialogFormVisible_addVideo = true;
             },
             // 重置添加
             resetForm(formName) { 
-                // this.$refs['ruleForm'].resetFields();
-                // this.$refs.formName.resetFields();
-                console.log(this.$refs);
-                console.log(this.$refs['formName']);
-                console.log(this.$refs['ruleForm']);
                 this.$refs['ruleForm'].resetFields();
-                console.log(this.$refs.formName);
-                console.log('重置');
+                // console.log(this.$refs.formName);
+                // console.log('重置');
             },
             // 取消添加视频
             cancelAddVideo(formName){
-                // this.resetForm(formName);
                 this.dialogFormVisible_addVideo = false; 
       
             },
             
             //提交添加视频
-            submitAddVideo(formName) {
-                const formData = {};
-                formData.video_id = formName.video_id;
-                formData.name = formName.name;
-                formData.category = formName.category;
-                formData.video_desc = formName.video_desc;
+            async submitAddVideo(formName) {
+                const params = {};
+                params.video_id = formName.video_id;
+                params.name = formName.name;
+                params.category = formName.category;
+                params.video_desc = formName.video_desc;
                 var tag = '';
                 for(let i of formName.tag){
                     tag += i + ';';
                 }
-                formData.tag = tag.slice(0, tag.length-1)   
-                //  console.log(formData.tag);
-                this.axios.post('http://localhost:8004/api/video/addVideo',formData)
-                 .then(res => {
-                    //  console.log(res);   
+                params.tag = tag.slice(0, tag.length-1);
+                this.dialogFormVisible_addVideo = false;
+                try {
+                    const res = await addVideo(params);
                     if(res.status == 200){
-                        console.log("提交成功");
-                        // this.tableData = [];
-                        // this.initData();
-                        this.dialogFormVisible_addVideo = false;
-                        this.tableData.push(res.data.video);
-                        
-                    }else{
-                        console.log("提交失败");
-                        this.dialogFormVisible_addVideo = false;
-                    } 
-                 })
-                 .catch(e => {
-                     console.log(e);
-                 })
+                        if(res.data.success == true){
+                            this.tableData.push(res.data.video);
+                            this.$message({
+                                showClose: true,
+                                type: 'success',
+                                message: res.data.msg
+                            });
+                            this.initData();
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                type: 'error',
+                                message: res.data.msg
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
                 
             },
 
-            //查询视频
-            queryVideo(key){
+            //查询视频数量
+            async queryVideo(){
                 const params = {};
-                params.name = key;
-                this.axios.post('http://localhost:8004/api/video/queryVideo',params)
-                .then(res => {
-                    if(res.status == 200){
-                        this.tableData = [];
-                        const tableData = [];
-                        // console.log(res)
-                        res.data.video.forEach(item => {
-                            const tableItem = {
-                                video_id: item.video_id,
-                                name: item.name,
-                                cover: item.cover,
-                                creat_time: item.creat_time,
-                                modify_time: item.modify_time,
-                                category: item.category,
-                                tag: item.tag,
-                                video_desc: item.video_desc,
-                                link: item.link,
+                params.name = this.query_video;
+                try {
+                    if(this.query_video != ''){
+                        this.currentPage = 0;
+                        const res = await queryVideoCount(params);
+                        // console.log(res);
+                        if(res.status == 200){
+                            if(res.data.success == true){
+                                this.count = res.data.total;
+                                this.queryVideoInfo();
+                            }else{
+                                this.$message({
+                                    showClose: true,
+                                    type: 'info',
+                                    message: res.data.msg
+                                });
                             }
-                            this.tableData.push(tableItem);
-                        });
-                    }                  
-                })
-                .catch(e => {
-                    console.log(e);
-                })
-            }
+                        }
+                    }else{
+                        this.initData();
+                        // this.getAllVideos();
+                    } 
+                } catch (error) {
+                    console.log(error);
+                }
+            },
             
+            //获取被查询视频信息
+            async queryVideoInfo(){
+                const params ={};
+                params.name = this.query_video;
+                params.page = this.currentPage-1;
+                params.num = this.limit;
+                try {
+                    const res = await queryVideoAll(params);
+                    // console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.videos.forEach(item => {
+                                const tableItem = {
+                                    video_id: item.video_id,
+                                    name: item.name,
+                                    cover: item.cover,
+                                    creat_time: item.creat_time,
+                                    modify_time: item.modify_time,
+                                    category: item.category,
+                                    tag: item.tag,
+                                    video_desc: item.video_desc,
+                                    link: item.link,
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                type: 'info',
+                                message: res.data.msg
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            }
         },
     }
 </script>
