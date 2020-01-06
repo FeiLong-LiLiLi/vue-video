@@ -121,7 +121,7 @@
                                 <el-input v-model="selectTable.email"></el-input>
                             </el-form-item>
                             <!-- 头像要改 -->
-                            <el-form-item label="头像" label-width="100px">
+                            <!-- <el-form-item label="头像" label-width="100px">
                                 <el-upload
                                 class="avatar-uploader"
                                 :action="baseUrl + '/v1/addimg/food'"
@@ -131,7 +131,7 @@
                                 <img v-if="selectTable.image_path" :src="baseImgPath + selectTable.image_path" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                                 </el-upload>
-                            </el-form-item>
+                            </el-form-item> -->
                             <el-form-item label="性别" label-width="100px">
                                 <el-radio-group v-model="selectTable.sex">
                                     <el-radio :label="3">男</el-radio>

@@ -3,20 +3,22 @@
         <head-top></head-top>
 		<section class="data_section">
 			<header class="section_title">数据统计</header>
+			 <!-- <el-button @click="getSevenData">获取七日数据</el-button>
+			  <el-button @click="getdate">显示七日数据</el-button> -->
 			<el-row :gutter="20" style="margin-bottom: 10px;">
                 <el-col :span="4"><div class="data_list today_head"><span class="data_num head">当日数据：</span></div></el-col>
-				<el-col :span="4"><div class="data_list"><span class="data_num">{{userCount}}</span> 新增用户</div></el-col>
-				<el-col :span="4"><div class="data_list"><span class="data_num">{{orderCount}}</span> 新增视频</div></el-col>
-                <el-col :span="4"><div class="data_list"><span class="data_num">{{adminCount}}</span> 新增管理员</div></el-col>
+				<el-col :span="4"><div class="data_list"><span class="data_num">{{loginCount}}</span> 登录量</div></el-col>
+				<el-col :span="4"><div class="data_list"><span class="data_num">{{playCount}}</span> 播放量</div></el-col>
+                <!-- <el-col :span="4"><div class="data_list"><span class="data_num">{{adminCount}}</span> 新增管理员</div></el-col> -->
 			</el-row>
-            <el-row :gutter="20">
+            <!-- <el-row :gutter="20">
                 <el-col :span="4"><div class="data_list all_head"><span class="data_num head">总数据：</span></div></el-col>
                 <el-col :span="4"><div class="data_list"><span class="data_num">{{allUserCount}}</span> 注册用户</div></el-col>
                 <el-col :span="4"><div class="data_list"><span class="data_num">{{allOrderCount}}</span> 视频</div></el-col>
                 <el-col :span="4"><div class="data_list"><span class="data_num">{{allAdminCount}}</span> 管理员</div></el-col>
-            </el-row>
+            </el-row> -->
 		</section>
-		<tendency :sevenDate='sevenDate' :sevenDay='sevenDay'></tendency>
+		<tendency :sevenDay='sevenDay' :sevenLoginData='sevenLoginData' :sevenPlayData='sevenPlayData'></tendency>
     </div>
 </template>
 
@@ -24,70 +26,160 @@
 	import headTop from '../components/headTop'
 	import tendency from '../components/tendency' 
 	import dtime from 'time-formater'
-	// import {userCount, orderCount, getUserCount, getOrderCount, adminDayCount, adminCount} from '@/api/getData'
+	import {getTodayLoginCount, getTodayPlayCount} from '@/api/getData'
     export default {
     	data(){
     		return {
-    			userCount: null,
-    			orderCount: null,
-                adminCount: null,
-                allUserCount: null,
-                allOrderCount: null,
-                allAdminCount: null,
-    			sevenDay: [],
-    			sevenDate: [[],[],[]],
+				loginCount: null,
+				playCount: null,
+    			// userCount: null,
+    			// orderCount: null,
+                // adminCount: null,
+                // allUserCount: null,
+                // allOrderCount: null,
+                // allAdminCount: null,
+				sevenDay: [],
+				sevenLoginData: [],
+				sevenPlayData: []
     		}
-    	},
+		},
+		created(){
+			this.initData();
+			this.updateRealTime();
+		},
     	components: {
     		headTop,
     		tendency,
-    	},
+		},
+		watch: {
+			$route(to,from){
+                if(to.path === '/manage'){  
+					this.initData();
+                }
+        	}
+		},
     	mounted(){
-    		this.initData();
-    		for (let i = 6; i > -1; i--) {
-    			const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD')
-    			this.sevenDay.push(date)
-    		}
-    		this.getSevenData();
+    		
     	},
         computed: {
 
         },
     	methods: {
-    		async initData(){
-    			// const today = dtime().format('YYYY-MM-DD')
-    			// Promise.all([userCount(today), orderCount(today), adminDayCount(today), getUserCount(), getOrderCount(), adminCount()])
-    			// .then(res => {
-    			// 	this.userCount = res[0].count;
-    			// 	this.orderCount = res[1].count;
-                //     this.adminCount = res[2].count;
-                //     this.allUserCount = res[3].count;
-                //     this.allOrderCount = res[4].count;
-                //     this.allAdminCount = res[5].count;
-    			// }).catch(err => {
-    			// 	console.log(err)
-    			// })
-    		},
-    		async getSevenData(){
-    			// const apiArr = [[],[],[]];
-    			// this.sevenDay.forEach(item => {
-    			// 	apiArr[0].push(userCount(item))
-    			// 	apiArr[1].push(orderCount(item))
-                //     apiArr[2].push(adminDayCount(item))
-    			// })
-    			// const promiseArr = [...apiArr[0], ...apiArr[1], ...apiArr[2]]
-    			// Promise.all(promiseArr).then(res => {
-    			// 	const resArr = [[],[],[]];
-				// 	res.forEach((item, index) => {
-				// 		if (item.status == 1) {
-				// 			resArr[Math.floor(index/7)].push(item.count)
-				// 		}
-				// 	})
-				// 	this.sevenDate = resArr;
-    			// }).catch(err => {
-    			// 	console.log(err)
-    			// })
-    		}
+			//初始化数据
+			initData(){
+				this.initLoginData();
+				this.initPlayData();
+				this.initSevenDay();
+				this.getLoginSevenData();
+				this.getPlaySevenData();
+			},
+			//初始化登录量
+			async initLoginData(){
+				// const date = dtime(new Date().getTime()).format('YYYY-MM-DD');
+				const params ={};
+				params.today = dtime(new Date().getTime()).format('YYYY-MM-DD');	
+				// console.log(params)
+				try {
+					const res = await getTodayLoginCount(params);
+					if(res.status == 200){
+						if(res.data.success == true){
+							this.loginCount = res.data.amount;
+						}else{
+							console.log(res.data.msg);
+						}
+					}
+				} catch (error) {
+					console.log(error)
+				}
+			},
+
+			//初始化播放量
+			async initPlayData(){
+				const params ={};
+				params.today = dtime(new Date().getTime()).format('YYYY-MM-DD');	
+				try {
+					const res = await getTodayPlayCount(params);
+					if(res.status == 200){
+						if(res.data.success == true){
+							this.playCount = res.data.amount;
+						}else{
+							console.log(res.data.msg);
+						}
+					}
+				} catch (error) {
+					console.log(error)
+				}
+			},
+
+			//初始化到今天为止的七天
+			initSevenDay(){
+				this.sevenDay = [];
+				for (let i = 6; i > -1; i--) {
+					const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
+					this.sevenDay.push(date);
+					// console.log(date);
+				}
+			},
+
+			//实时更新（一小时一次）
+			updateRealTime() {
+                setInterval(() =>{this.initData()}, 60*60*1000);
+			},
+			
+			//获取七日登录数据
+			async getLoginSevenData(){
+				try {
+					this.sevenLoginData = [];
+					const params ={};
+					// console.log(this.sevenDay);
+					for(var i = 0; i < 8; i++){
+						// console.log(this.sevenDay[i]);
+						params.today = this.sevenDay[i];
+						
+						const res = await getTodayLoginCount(params);
+						if(res.status == 200){
+							if(res.data.success == true){
+								this.sevenLoginData.push(res.data.amount)
+							}
+						}
+					}
+				} catch (error) {
+					console.log(error)
+				}
+			},
+
+			//获取七日播放数据
+			async getPlaySevenData(){
+				try {
+					this.sevenPlayData = [];
+					const params ={};
+					// console.log(this.sevenDay);
+					for(var i = 0; i < 8; i++){
+						// console.log(this.sevenDay[i]);
+						params.today = this.sevenDay[i];
+						
+						const res = await getTodayPlayCount(params);
+						if(res.status == 200){
+							if(res.data.success == true){
+								this.sevenPlayData.push(res.data.amount)
+							}
+						}
+					}
+				} catch (error) {
+					console.log(error)
+				}
+			},
+
+			getSevenData(){
+
+			},
+			//获取数据测试
+			getdate(){
+				// const date = dtime(new Date().getTime()).format('YYYY-MM-DD');
+				// console.log(date);
+				console.log(this.sevenPlayData);
+			},
+			
     	}
     }
 </script>

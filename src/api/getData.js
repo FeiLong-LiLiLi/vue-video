@@ -251,6 +251,18 @@ export const login = data => axios.post('http://localhost:8004/api/admins/login'
 export const logout = data => axios.post();
 
 /**
+ * 获取当日用户登录量
+ */
+
+ export const getTodayLoginCount = data => axios.get('http://localhost:8004/api/info/today/amount/login', {params: {today: data.today}});
+
+/**
+ * 获取当日用户播放量
+ */
+
+export const getTodayPlayCount = data => axios.get('http://localhost:8004/api/info/today/amount/play', {params: {today: data.today}});
+
+/**
  * 获取用户数量
  */
 
@@ -441,3 +453,9 @@ export const delTag = tag => axios.get('http://localhost:8004/api/tags/del', {pa
  */
 
 // export const queryTags = data => axios.post();
+
+
+/**
+ * 获取视频当前播放信息
+ */
+export const getVideoNowInfo = () => axios.get('http://localhost:8004/api/monitor/now/get');

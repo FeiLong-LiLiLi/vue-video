@@ -113,7 +113,8 @@
                             <el-form-item label="视频名称" label-width="100px">
                                 <el-input v-model="selectTable.name"></el-input>
                             </el-form-item>
-                            <el-form-item label="视频封面" label-width="100px">
+                            <!-- 封面要改 -->
+                            <!-- <el-form-item label="视频封面" label-width="100px">
                                 <el-upload
                                 class="avatar-uploader"
                                 :action="baseUrl + '/v1/addimg/food'"
@@ -123,7 +124,7 @@
                                 <img v-if="selectTable.image_path" :src="baseImgPath + selectTable.image_path" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                                 </el-upload>
-                            </el-form-item>
+                            </el-form-item> -->
                             <el-form-item label="视频类别" label-width="100px">
                                  <el-select v-model="selectTable.category" clearable filterable placeholder="请选择">
                                     <el-option

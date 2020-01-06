@@ -26,8 +26,9 @@
         props: ['typeData'],
         methods: {
             initData(){
-                    this.categories = [];
-                    this.number = [];
+                console.log(this.typeData.length);
+                this.categories = [];
+                this.number = [];
                 for(var i = 0; i< this.typeData.length; i++){ 
                     this.categories.push(this.typeData[i].category);
                     this.number.push(this.typeData[i].num)
@@ -64,6 +65,7 @@
                         type: 'value'
                     },
                     series: [{
+                        // name: '性别比例',
                         type: 'bar',
                         name: '数量',
                         // data: [120, 200, 150, 80, 70, 110, 130,122,535,532,76,86,434],
@@ -83,7 +85,6 @@
                 };
                
                 this.myChart.setOption(option);
-                //  console.log(option)
             }
         },
         watch: {

@@ -58,6 +58,7 @@
                         if(res.data.success == true){
                             // this.pieData = {};
                             this.pieData = res.data.allCategoriesNum;
+                            // console.log(this.pieData);
                         }
                     }
                 } catch (error) {
@@ -65,10 +66,10 @@
                 }
             },
             
-            async test(){
-                alert('test');
-                console.log(test);
-            }
+            // async test(){
+            //     alert('test');
+            //     console.log(test);
+            // }
     	}
 
 }

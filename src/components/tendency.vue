@@ -19,9 +19,11 @@
             this.myChart = echarts.init(document.getElementById('line1'));
             this.initData();
         },
-        props: ['sevenDate', 'sevenDay'],
+        props: ['sevenDay', 'sevenLoginData', 'sevenPlayData'],
         methods: {
             initData(){
+                // console.log(this.sevenPlayData);
+                
                 const colors = ['#5793f3', '#675bba', '#d14a61'];
                 const option = {
                     color: colors,
@@ -33,7 +35,7 @@
                         trigger: 'axis'
                     },
                     legend: {
-                        data:['新注册用户', '新增视频', '新增管理员']
+                        data:['当日登录量', '当日播放量']
                     },
                     toolbox: {
                         show: true,
@@ -55,8 +57,8 @@
                         {
                           type: 'value',
                           name: '用户',
-                          min: 0,
-                          max: 200,
+                        //   min: 0,
+                        //   max: 200,
                           position: 'left',
                           axisLine: {
                               lineStyle: {
@@ -69,9 +71,9 @@
                         },
                         {
                           type: 'value',
-                          name: '视频',
-                          min: 0,
-                          max: 200,
+                          name: '',
+                        //   min: 0,
+                        //   max: 200,
                           position: 'right',
                           axisLine: {
                               lineStyle: {
@@ -85,9 +87,9 @@
                     ],
                     series: [
                         {
-                            name:'新注册用户',
+                            name:'当日用户登录量',
                             type:'line',
-                            data:this.sevenDate[0],
+                            data:this.sevenLoginData,
                             yAxisIndex: 1,
                             markPoint: {
                                 data: [
@@ -97,21 +99,9 @@
                             },
                         },
                         {
-                            name:'新增视频',
+                            name:'当日视频播放量',
                             type:'line',
-                            data:this.sevenDate[1],
-                            yAxisIndex: 1,
-                            markPoint: {
-                                data: [
-                                    {type: 'max', name: '最大值'},
-                                    {type: 'min', name: '最小值'}
-                                ]
-                            },
-                        },
-                        {
-                            name:'新增管理员',
-                            type:'line',
-                            data:this.sevenDate[2],
+                            data: this.sevenPlayData,
                             yAxisIndex: 1,
                             markPoint: {
                                 data: [
@@ -126,12 +116,16 @@
             }
         },
         watch: {
-            sevenDate: function (){
-                this.initData()
-            },
             sevenDay: function (){
-                this.initData()
+                this.initData();
+            },
+            sevenLoginData: function (){
+                this.initData();
+            },
+            sevenPlayData: function () {
+                this.initData();
             }
+            
         }
     }
 </script>
