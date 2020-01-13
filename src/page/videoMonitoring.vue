@@ -1,82 +1,94 @@
 <template>
     <div class="fillcontain">
         <head-top></head-top>
+        <div class="page-title">视频监控</div>
+        <!-- <el-button @click="test">测试按钮</el-button> -->
+        <div class="head-button">
+            <div>
+                <el-button @click="initData">实时监控</el-button>
+            </div>
+            <div class="block">
+                <span class="demonstration">大于某个时间点播放</span>
+                <el-date-picker
+                v-model="timePoint"
+                type="datetime"
+                placeholder="任意时间点">
+                </el-date-picker>
+                <el-button @click="queryTimePointVideos">查询</el-button>
+            </div>
+
+            <!-- <div class="block">
+                <span class="demonstration">某天播放</span>
+                <el-date-picker
+                v-model="oneDay"
+                align="right"
+                type="date"
+                placeholder="选择日期"
+                :picker-options="pickerOptionsDay">
+                </el-date-picker>
+                <el-button @click="queryOnedayUsers">查询</el-button> 
+            </div>
+
+            <div class="block">
+                <span class="demonstration">某段时间</span>
+                <el-date-picker
+                v-model="someTime"
+                type="datetimerange"
+                :picker-options="pickerOptionsTime"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                align="right">
+                </el-date-picker>
+                <el-button @click="querySomeTimeUsers">查询</el-button> 
+            </div> -->
+                        
+            <!-- <el-button @click="initGetUser">当前播放</el-button>
+            <el-button @click="initDate">某天播放</el-button>
+            <el-button @click="initDate">某段时间播放</el-button> -->
+        </div>
         <div class="table-container">
-    
             <!-- 表格信息开始 -->
              <el-table
                 :data="tableData"
-                @expand='expand'
-                :expand-row-keys='expendRow'
-                :row-key="row => row.index"
                 style="width: 100%">
-            <!-- <el-table
-                :data="tableData"
-                style="width: 100%"> -->
-                <el-table-column type="expand">
-                    <template slot-scope="props">
-                        <el-form label-position="left" inline class="demo-table-expand">
-                            <el-form-item label="视频名称">
-                                <span>{{ props.row.video_name }}</span>
-                            </el-form-item>
-                            <el-form-item label="视频封面">
-                                <span>{{ props.row.avater }}</span>
-                                <img src="" alt="" class="video-cover">
-                            </el-form-item>
-                            <el-form-item label="视频 ID">
-                                <span>{{ props.row.video_id }}</span>
-                            </el-form-item>
-                            <el-form-item label="发布时间">
-                                <span>{{ props.row.creat_time }}</span>
-                            </el-form-item>
-                            <el-form-item label="修改时间">
-                                <span>{{ props.row.modify_time }}</span>
-                            </el-form-item>
-                            <el-form-item label="类别">
-                                <span>{{ props.row.category}}</span>
-                            </el-form-item>
-                            <el-form-item label="标签">
-                                <span>{{ props.row.tag }}</span>
-                            </el-form-item>
-                            <el-form-item label="视频简介">
-                                <span>{{ props.row.desc }}</span>
-                            </el-form-item>
-                            <el-form-item label="视频地址">
-                                <span>{{ props.row.link }}</span>
-                            </el-form-item>
-                        </el-form>
-                    </template>
+                <el-table-column
+                    label="视频名"
+                    width="180">
+                <template slot-scope="scope">
+                    {{ scope.row.videoName }}
+                </template>
                 </el-table-column>
                 <el-table-column
-                    label="序号"
-                    type="index"
+                    label="播放源">
+                <template slot-scope="scope">
+                   {{ scope.row.videoUrl}}
+                </template>
+                </el-table-column>
+                <!-- <el-table-column
+                    label="视频时长"
                     width="100">
-                </el-table-column>
+                <template slot-scope="scope">
+                     {{ scope.row.videoDuration }}
+                </template>
+                </el-table-column>   -->
                 <el-table-column
-                    label="视频名称"
-                    prop="video_name"
-                    width="200">
+                    label="正在观看人数"
+                    width="240">
+                <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                    <span>{{ scope.row.userCount }}</span>
+                </template>
                 </el-table-column>
-                <el-table-column
-                    label="视频 ID"
-                    prop="video_id"
-                    width="200">
-                </el-table-column>
-                <el-table-column
-                  label="正在观看人数"
-                  prop="desc">
-                </el-table-column>
-                <el-table-column label="操作">
-                  <template slot-scope="scope">
-                      <router-link to="/videoMonitoring/videoMonView">
-                        <el-button 
-                        size="small"
-                        type="danger"
-                        @click="enterView(scope.$index, scope.row)"
-                        >进入查看</el-button>
-                      </router-link>
+                <!-- <el-table-column label="操作">
+                <template slot-scope="scope">   
+                    <el-button 
+                    size="small"
+                    type="danger"
+                    @click="enterView(scope.$index, scope.row)"
+                    >进入查看</el-button> 
                   </template>
-                </el-table-column>
+                </el-table-column> -->
             </el-table>
             <!-- 表格信息结束 -->
 
@@ -92,6 +104,8 @@
                 </el-pagination>
             </div>
             <!-- 分页结束 -->
+            
+  
 
 
         </div>
@@ -100,116 +114,158 @@
 
 <script>
     import headTop from '../components/headTop'
-    
+    import dtime from 'time-formater'
     import {baseUrl, baseImgPath} from '@/config/env'
-    // import {getFoods, getFoodsCount, getMenu, updateFood, deleteFood, getResturantDetail, getMenuById} from '@/api/getData'
+    import {getNowPlayVideo, getToDayUsers, getTimePointUsers, getOneDayUsers, getSomeTimeUsers} from '@/api/getData'
     export default {
         data(){
             return {
-                baseUrl,
-                baseImgPath,
-
-                restaurant_id: null,
-                city: {},
-
-                // 查询
-                search_user: '',
-
+                infos: '',
                 tableData: [{
-                    video_name: '好滋好味',
-                    cover: '头像位置',
-                    category: '动漫',
-                    video_id: '123',
-                    creat_time: '2016-09-01',
-                    modify_time: '2000-01-01',
-                    tag: '要改',
-                    desc: '1',
-                    link: 'https.......'
+                    videoName: '王小虎',
+                    videoUrl: '上海市普陀区金沙江路 1518 弄',
+                    videoDuration: '10:10',
+                    nowPlayUsersCount: 10
+                    }],
+
+                pickerOptionsDay: {
+                    shortcuts: [{
+                        text: '今天',
+                        onClick(picker) {
+                        picker.$emit('pick', new Date());
+                        }
                     }, {
-                    video_name: '好滋',
-                    cover: '头像位置',
-                    category: '动漫',
-                    video_id: '456',
-                    creat_time: '2016-09-01',
-                    modify_time: '2000-01-01',
-                    tag: '搞笑',
-                    desc: '11',
-                    link: 'https.......'
-                }],
+                        text: '昨天',
+                        onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24);
+                        picker.$emit('pick', date);
+                        }
+                    }, {
+                        text: '一周前',
+                        onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', date);
+                        }
+                    }]
+                },
+                pickerOptionsTime: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                },
+                timePoint: '',
+                oneDay: '',
+                someTime: '',
+              
 
                 // 分页
                 currentRow: null,
                 offset: 0,
                 currentPage: 1, 
                 limit: 20,
-                count: 200,
-
-                
-                dialogFormVisible: false,   //编辑页面
-                dialogFormVisible_adduser: false,   //添加用户
-
-                // 更新用户信息
-                // updataUserInfo: {
-                //     user_name: '用户X',
-                //     phone: 'phone',
-                //     email: '123',
-                //     sex: 9,
-                //     date: '2010-01-01',
-                //     desc: "2334",
-                // },
-                updataUserInfo: {},
-
-
-                
-                //视频类别
-                choose_video_category: [{
-                    value: '选项1',
-                    label: '综艺'
-                    }, {
-                    value: '选项2',
-                    label: '动漫'
-                }],
-                video_category: '',
-
-                //视频标签
-                choose_video_tag: [{
-                    value: 'HTML',
-                    label: 'HTML'
-                    }, {
-                    value: 'JavaScript',
-                    label: 'JavaScript'
-                    }],
-                video_tag: [],
-                 //日期
-                pickerOptions1: {
-                    disabledDate(time) {
-                    return time.getTime() > Date.now();
-                    },
-                },
-                value1: '',
+                count: 200, 
                 expendRow: [],
 
-
-                videoFlag: false,
-                //是否显示进度条
-                videoUploadPercent: "",
-                //进度条的进度，
-                isShowUploadVideo: false,
-                //显示上传按钮
-                videoForm: {
-                    showVideoPath: ''
-                },
-
-    
             }
         },
+        created(){
+            this.initData();
+
+        },
+        watch: {
+
+            $route(to,from){
+                if(to.path === '/videoMonitoring'){ 
+                    // console.log('enter'); 
+                    this.initData()
+                };
+                if(from.path === '/videoMonitoring'){
+                    // console.log('leave')
+                    this.clearMonitorVideo();
+                   
+                }
+               
+        	}
+        },
         computed: {
-            // ...mapState(['adminInfo']),
+    
         },
     	components: {
     		headTop,
     	},
-        methods: {      
+        methods: {
+            initData(){
+                this.initVideosData();
+                this.monitorVideo()
+            },
+
+            //20秒实时更新
+            monitorVideo(){
+                this.infos = setInterval(() => {
+                    this.initVideosData()
+                    // console.log(111)
+                }, 20*1000);
+            },
+
+            //取消清除实时更新
+            clearMonitorVideo(){
+                clearInterval(this.infos);
+            },
+
+            //获取监控数据
+            async initVideosData(){
+                try {
+                    const timePoint = dtime(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
+                    const oneMinsAgeTime = this.getOneAgeTime(timePoint);
+                    const params = {oneMinsAgeTime:oneMinsAgeTime};
+                    const res = await getNowPlayVideo(params);
+                    // console.log(res)
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.nowPlayVideos.forEach(item => {
+                                const tableItem = {
+                                    videoId: item.videoId,
+                                    videoName: item.video_name,
+                                    videoUrl: item.video_url,
+                                    userCount: item.userCount
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                        console.log(error)
+                }
+            },
+
+            
             // 分页
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -217,141 +273,154 @@
             handleCurrentChange(val) {
                 this.currentPage = val;
                 this.offset = (val - 1)*this.limit;
+                // this.getFoods()
             },
-
+            
             expand(row, status){
             	if (status) {
-            		// this.getSelectItemData(row)
+            		this.getSelectItemData(row)
             	}else{
                     const index = this.expendRow.indexOf(row.index);
                     this.expendRow.splice(index, 1)
                 }
             },
 
-
-
-            getSelectItemUserData(row, type){
-                console.log("获取的信息");
-                console.log(row);
-                // console.log(row.user_name);
-                const updataUserInfo = {};
-                updataUserInfo.user_name = row.user_name;
-                console.log(updataUserInfo.user_name);
-
-
-            },
-
-            enterView(index, row){
-                //  <router-link to="/videoMonView"></router-link>
-                console.log(index+1);
-                console.log('切换页面');
-            },
-
-
-            //测试获取信息
-            getInfo(row){
-                console.log("111");
-                console.log(row);
-                // console.log(tableData);
-            },
-            // 更新数据
-            updateUserInfo(){
-                console.log("呵呵，这是更新");
-                this.dialogFormVisible = false;
-            },
-            
-            //对话框关闭
-            handleClose(done,formName) {
-                this.$confirm('是否保存数据？')
-                .then(_ => {
-                    // this.$refs[formName].resetFields();
-                    done();
-                })
-                .catch(_ => {});
-            },
-
-            //视频上传前回调
-            beforeUploadVideo(file) {
-                var fileSize = file.size / 1024 / 1024 < 50;
-                if (['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file.type) == -1) {
-                    layer.msg("请上传正确的视频格式");
-                    return false;
-                }
-                if (!fileSize) {
-                    layer.msg("视频大小不能超过50MB");
-                    return false;
-                }
-                this.isShowUploadVideo = false;
-            },
-            //视频进度条
-            uploadVideoProcess(event, file, fileList) {
-                this.videoFlag = true;
-                this.videoUploadPercent = file.percentage.toFixed(0) * 1;
-            },
-            //视频上传成功回调
-            handleVideoSuccess(res, file) {
-                this.isShowUploadVideo = true;
-                this.videoFlag = false;
-                this.videoUploadPercent = 0;
-                
-                //前台上传地址
-                //if (file.status == 'success' ) {
-                //    this.videoForm.showVideoPath = file.url;
-                //} else {
-                //     layer.msg("上传失败，请重新上传");
-                //}
-
-                //后台上传地址
-                if (res.Code == 0) {
-                    this.videoForm.showVideoPath = res.Data;
-                } else {
-                    layer.msg(res.Message);
-                }
-            },
-
-            // 增加
-            addUserInfo(formName){
-                // alert("1111");
-                console.log("增加");
-                // this.resetForm(formName);
-                this.dialogFormVisible_adduser = true;
-            },
-            // 重置添加
-            resetForm(formName) { 
-                // console.log(formName);
-                // resetFields();    
-                this.$refs[formName].resetFields();   
-            },
-            // 取消添加用户
-            cancelAddUser(formName){
-                // this.resetForm(formName);
-                this.dialogFormVisible_adduser = false; 
-                console.log("取消");
-            },
-            
-            //提交添加用户
-            submitAddUser(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        console.log(formName);
-                        this.resetForm(formName);
-                        this.dialogFormVisible_adduser = false;
-                        console.log("提交成功");
-                        // alert('submit!');           
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
+            enterView(index,row){
+                // console.log(index, row);
+                this.$router.push({
+                    path: 'userMonView',
+                    query: row
                 });
                 
             },
             
+            //获取一分钟前时间
+            getOneAgeTime(time){ 
+                const nowTime = dtime(time).format('x');
+                const oneMinsAgeTime = dtime(nowTime-60*1000).format('YYYY-MM-DD HH:mm:ss')
+                return oneMinsAgeTime;
+            },
+
+            //某时播放
+            async queryTimePointVideos(){
+                try {
+                    this.clearMonitorVideo();
+                    const oneMinsAgeTime = this.getOneAgeTime(this.timePoint);
+                    // const today = dtime(oneMinsAgeTime).format('YYYY-MM-DD');
+                    const params = {oneMinsAgeTime: oneMinsAgeTime}
+                    const res = await getNowPlayVideo(params);
+                    // console.log(res)
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.nowPlayVideos.forEach(item => {
+                                const tableItem = {
+                                    videoId: item.videoId,
+                                    videoName: item.video_name,
+                                    videoUrl: item.video_url,
+                                    userCount: item.userCount
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+
+            },
+
+            // //某天播放
+            // async queryOnedayUsers(){
+            //     try {
+            //         const params = {};
+            //         params.oneDay = dtime(this.oneDay).format('YYYY-MM-DD');
+            //         const res = await getOneDayUsers(params);
+            //         // console.log(res);
+            //         if(res.status == 200){
+            //             if(res.data.success == true){
+            //                 this.tableData = [];
+            //                 res.data.playUsers.forEach(item => {
+            //                     const tableItem = {
+            //                         date :  dtime(item.start_date).format('YYYY-MM-DD'),
+            //                         userId : item.user_id,
+            //                         userName : item.user_name,
+            //                         videoId : item.video_id,
+            //                         videoName : item.video_name,
+            //                         videoUrl : item.video_url,
+            //                         videoDuration: item.video_duration,
+            //                         startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+            //                     }
+            //                     this.tableData.push(tableItem);
+            //                     // console.log(this.tableData)
+            //                 });
+            //                 // console.log(this.tableData)
+            //             }else{
+            //                 console.log('获取数据失败')
+            //             }
+            //         }
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // },
+
+            // //某段时间播放
+            // async querySomeTimeUsers(){
+            //     try {
+            //         const params = {
+            //             startTime: dtime(this.someTime[0]).format('YYYY-MM-DD HH:mm:ss'),
+            //             endTime: dtime(this.someTime[1]).format('YYYY-MM-DD HH:mm:ss')
+            //         }
+            //         // console.log(params);
+            //         const res = await getSomeTimeUsers(params);
+            //         // console.log(res);
+            //         if(res.status == 200){
+            //             if(res.data.success == true){
+            //                 this.tableData = [];
+            //                 res.data.playUsers.forEach(item => {
+            //                     const tableItem = {
+            //                         date :  dtime(item.start_date).format('YYYY-MM-DD'),
+            //                         userId : item.user_id,
+            //                         userName : item.user_name,
+            //                         videoId : item.video_id,
+            //                         videoName : item.video_name,
+            //                         videoUrl : item.video_url,
+            //                         videoDuration: item.video_duration,
+            //                         startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+            //                     }
+            //                     this.tableData.push(tableItem);
+            //                 });
+            //                 // console.log(this.tableData)
+            //             }else{
+            //                 console.log('获取数据失败')
+            //             }
+            //         }
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // },
+
+            test(){
+                
+                // this.getNowPlayVideo(this.tableData);
+                
+                
+                // console.log(this.nowTablePlayData)
+                
+            },
         },
     }
 </script>
 
 <style lang="less">
-	@import '../style/mixin';
+    @import '../style/mixin';
+    .page-title{
+        font-size: 30px;
+        text-align: center;
+        padding: 20px;
+    }
     .demo-table-expand {
         font-size: 0;
     }
@@ -402,18 +471,10 @@
         width: 300px;
         display: inline-block;
     }
-    .add-button{
+    .adduser-button{
         // display: inline-block;
         margin-right: 200px;
         float: right;
     }
-   
-    .video-cover{
-        width: 40px;
-        height: 60px;
-        background-color: #20a0ff;
-    }
-    .upload-video .avatar-uploader-icon{
-        width: 240px;
-    }
+
 </style>

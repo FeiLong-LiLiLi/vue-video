@@ -203,7 +203,7 @@
 
 <script>
     import headTop from '../components/headTop'
-    
+    import dtime from 'time-formater'
     import {baseUrl, baseImgPath} from '@/config/env'
     import {getAdminCount, getAllAdmins, delAdmin, addAdmin, updateAdmin, queryAdminCount, queryAdminAll} from '@/api/getData'
     export default {
@@ -422,9 +422,10 @@
                             name: item.name,
                             phone: item.phone,
                             email: item.email,
-                            creat_time:item.creat_time.substring(0, 11),
+                            // creat_time: item.creat_time,
+                            creat_time: dtime(item.creat_time).format('YYYY-MM-DD'),
                             sex: item.sex,
-                            birth: item.birth,
+                            birth: dtime(item.birth).format('YYYY-MM-DD'),
                             personal_signature: item.personal_signature,
                         }
                         this.tableData.push(tableItem);
@@ -467,12 +468,14 @@
                 const params = formName;
                 params.sex = this.toTextSex(formName.sex);
                 this.dialogFormVisible = false;
+                console.log(params);
                 try {
                     const res = await updateAdmin(params);
                     // console.log(res);
                     if(res.status == 200 && res.data.success == true){
                         const resData = res.data.admin;
-                        resData.creat_time = res.data.admin.creat_time.substring(0, 11);
+                        resData.creat_time = dtime(res.data.admin.creat_time).format('YYYY-MM-DD');
+                        resData.birth = dtime(res.data.admin.birth).format('YYYY-MM-DD')
                         this.tableData.splice(params.index, 1, resData);
                         this.$message({
                             showClose: true,
@@ -547,7 +550,7 @@
 
             // 更新数据
             updateUserInfo(){
-                console.log("呵呵，这是更新");
+                // console.log("呵呵，这是更新");
                 this.dialogFormVisible = false;
             },
             
@@ -657,9 +660,9 @@
                                     name: item.name,
                                     phone: item.email,
                                     email: item.email,
-                                    creat_time: item.creat_time.substring(0, 11),
+                                    creat_time: dtime(item.creat_time).format('YYYY-MM-DD'),
                                     sex: item.sex,
-                                    birth: item.birth,
+                                    birth: dtime(item.birth).format('YYYY-MM-DD'),
                                     personal_signature: item.personal_signature,
                                 }
                                 this.tableData.push(tableItem);

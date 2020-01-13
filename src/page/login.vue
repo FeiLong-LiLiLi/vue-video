@@ -25,7 +25,8 @@
 </template>
 
 <script>
-	import {login, getAdminInfo} from '@/api/getData'
+	import {login, getAdminInfo, initSevenData} from '@/api/getData'
+	import dtime from 'time-formater'
 	import {mapActions, mapState} from 'vuex'
 
 	export default {
@@ -64,19 +65,22 @@
 					try {
 						const res = await login(params);
 						// console.log(res);
-						if(res.status == 200 && res.data.success == true){
-							this.$message({
-								showClose: true,
-								message: res.data.msg,
-								type: 'success'
-							});
-							this.$router.push('manage');
-						}else{
+						if(res.status == 200){
+							if(res.data.success == true){
+								this.$message({
+									showClose: true,
+									message: res.data.msg,
+									type: 'success'
+								});
+								this.initSevenDay();
+							}
+							else{
 							this.$message({
 								showClose: true,
 								message: res.data.msg,
 								type: 'warning'
 							});
+						}
 						}
 					} catch (error) {
 						console.log(error);
@@ -90,33 +94,42 @@
 					return false;
 				}
 				
-				// console.log(this.$refs[formName]);
-				// this.$refs[formName].validate(async (valid) => {
-				// 	this.$router.push('manage')
-					//判断登陆
-					// if (valid) {
-					// 	const res = await login({user_name: this.loginForm.username, password: this.loginForm.password})
-					// 	if (res.status == 1) {
-					// 		this.$message({
-		            //             type: 'success',
-		            //             message: '登录成功'
-		            //         });
-					// 		this.$router.push('manage')
-					// 	}else{
-					// 		this.$message({
-		            //             type: 'error',
-		            //             message: res.message
-		            //         });
-					// 	}
-					// } else {
-					// 	this.$notify.error({
-					// 		title: '错误',
-					// 		message: '请输入正确的用户名密码',
-					// 		offset: 100
-					// 	});
-					// 	return false;
-					// }
-				// });
+			},
+
+			//初始化数据
+			async initSevenDay(){
+				this.sevenDay = [];
+				for (let i = 6; i > -1; i--) {
+					const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
+					this.sevenDay.push(date);
+					// console.log(date);
+					// console.log(this.sevenDay);
+					try {	
+						const params = {today : date}
+						// console.log(params);
+						const init = await initSevenData(params);
+						if(init.status == 200){
+							if(init.data.success == false){
+								this.$message({
+									showClose: true,
+									message: init.data.msg,
+									type: 'error'
+								});
+							}
+							this.$router.push('manage');
+						}else{
+							this.$message({
+								showClose: true,
+								message: '初始化数据失败',
+								type: 'error'
+							});
+							this.$router.push('manage');
+						}
+
+					}catch (error) {
+						console.log(error);
+					}
+				}
 			},
 		},
 		watch: {

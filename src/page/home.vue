@@ -26,7 +26,7 @@
 	import headTop from '../components/headTop'
 	import tendency from '../components/tendency' 
 	import dtime from 'time-formater'
-	import {getTodayLoginCount, getTodayPlayCount} from '@/api/getData'
+	import {initSevenData, getTodayLoginCount, getTodayPlayCount} from '@/api/getData'
     export default {
     	data(){
     		return {
@@ -44,8 +44,10 @@
     		}
 		},
 		created(){
-			this.initData();
 			this.updateRealTime();
+			
+			setTimeout(this.initData(),3000)
+			
 		},
     	components: {
     		headTop,
@@ -67,12 +69,46 @@
     	methods: {
 			//初始化数据
 			initData(){
+				this.initSevenDay();
 				this.initLoginData();
 				this.initPlayData();
-				this.initSevenDay();
 				this.getLoginSevenData();
 				this.getPlaySevenData();
 			},
+
+			//初始化到今天为止的七天
+			async initSevenDay(){
+				this.sevenDay = [];
+				for (let i = 6; i > -1; i--) {
+					const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
+					this.sevenDay.push(date);
+					// console.log(date);
+					// console.log(this.sevenDay);
+					// try {	
+					// 	const params = {today : date}
+					// 	console.log(params);
+					// 	const init = await initSevenData(params);
+					// 		if(init.status == 200){
+					// 			if(init.data.success == false){
+					// 				this.$message({
+					// 					showClose: true,
+					// 					message: init.data.msg,
+					// 					type: 'error'
+					// 				});
+					// 			}
+					// 		}else{
+					// 			this.$message({
+					// 				showClose: true,
+					// 				message: '初始化数据失败',
+					// 				type: 'error'
+					// 			});
+					// 		}
+					// 	}catch (error) {
+					// 		console.log(error);
+					// }
+				}
+			},
+
 			//初始化登录量
 			async initLoginData(){
 				// const date = dtime(new Date().getTime()).format('YYYY-MM-DD');
@@ -81,6 +117,7 @@
 				// console.log(params)
 				try {
 					const res = await getTodayLoginCount(params);
+					console.log(res);
 					if(res.status == 200){
 						if(res.data.success == true){
 							this.loginCount = res.data.amount;
@@ -99,6 +136,7 @@
 				params.today = dtime(new Date().getTime()).format('YYYY-MM-DD');	
 				try {
 					const res = await getTodayPlayCount(params);
+					// console.log(res);
 					if(res.status == 200){
 						if(res.data.success == true){
 							this.playCount = res.data.amount;
@@ -111,15 +149,6 @@
 				}
 			},
 
-			//初始化到今天为止的七天
-			initSevenDay(){
-				this.sevenDay = [];
-				for (let i = 6; i > -1; i--) {
-					const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
-					this.sevenDay.push(date);
-					// console.log(date);
-				}
-			},
 
 			//实时更新（一小时一次）
 			updateRealTime() {
@@ -135,7 +164,6 @@
 					for(var i = 0; i < 8; i++){
 						// console.log(this.sevenDay[i]);
 						params.today = this.sevenDay[i];
-						
 						const res = await getTodayLoginCount(params);
 						if(res.status == 200){
 							if(res.data.success == true){
@@ -157,7 +185,6 @@
 					for(var i = 0; i < 8; i++){
 						// console.log(this.sevenDay[i]);
 						params.today = this.sevenDay[i];
-						
 						const res = await getTodayPlayCount(params);
 						if(res.status == 200){
 							if(res.data.success == true){
@@ -171,7 +198,28 @@
 			},
 
 			getSevenData(){
-
+				// try {	
+					// 	const params = {today : date}
+					// 	console.log(params);
+					// 	const init = await initSevenData(params);
+					// 	if(init.status == 200){
+					// 		if(init.data.success == false){
+					// 			this.$message({
+					// 				showClose: true,
+					// 				message: init.data.msg,
+					// 				type: 'error'
+					// 			});
+					// 		}
+					// 	}else{
+					// 		this.$message({
+					// 			showClose: true,
+					// 			message: '初始化数据失败',
+					// 			type: 'error'
+					// 		});
+					// 	}
+					// }catch (error) {
+					// 	console.log(error);
+					// }
 			},
 			//获取数据测试
 			getdate(){

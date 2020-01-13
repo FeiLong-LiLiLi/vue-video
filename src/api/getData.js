@@ -250,6 +250,12 @@ export const login = data => axios.post('http://localhost:8004/api/admins/login'
 
 export const logout = data => axios.post();
 
+
+/**
+ * 初始化七天数据
+ */
+export const initSevenData = data => axios.post('http://localhost:8004/api/info/today/init', data);
+
 /**
  * 获取当日用户登录量
  */
@@ -398,7 +404,8 @@ export const queryVideoCount = data => axios.post('http://localhost:8004/api/vid
  * 获取被查询视频信息
  */
 
- export const queryVideoAll = data => axios.get('http://localhost:8004/api/video/queryVideo/all', {params: {name: data.name, page: data.page, num: data.num}})
+ export const queryVideoAll = data => 
+ axios.get('http://localhost:8004/api/video/queryVideo/all', {params: {name: data.name, page: data.page, num: data.num}})
 
 /**
  * 获取所有视频类别数量
@@ -459,3 +466,46 @@ export const delTag = tag => axios.get('http://localhost:8004/api/tags/del', {pa
  * 获取视频当前播放信息
  */
 export const getVideoNowInfo = () => axios.get('http://localhost:8004/api/monitor/now/get');
+
+
+/**
+ * 获取当天日播放视频的用户
+ */
+
+ export const getToDayUsers = data => axios.get('http://localhost:8004/api/info/today/user/play/info', {params: {today: data.today}});
+
+
+ /**
+  * 获取当前用户播放事情的信息
+  */
+
+  export const getNowPlayInfo = data => 
+  axios.get('http://localhost:8004/api/monitor/now/play/info/get', {params: {userId: data.userId,videoId: data.videoId,startTime: data.startTime}});
+
+
+  /**
+   * 获取某个时间点正在看视频的用户
+   */
+  export const getTimePointUsers = data => 
+  axios.get('http://localhost:8004/api/monitor/now/play/now/get', {params:{oneMinsAgeTime: data.oneMinsAgeTime, today: data.today}});
+
+/**
+ * 获取某天日播放视频的用户
+ */
+
+export const getOneDayUsers = data => axios.get('http://localhost:8004/api/monitor/now/play/oneDay/get', {params: {oneDay: data.oneDay}});
+
+/**
+ * 获取某段时间播放视频的用户
+ */
+
+export const getSomeTimeUsers = data => 
+axios.get('http://localhost:8004/api/monitor/now/play/someTime/get', {params: {startTime: data.startTime, endTime: data.endTime}});
+
+
+/**
+ * 获取当前最新播放的视频以及用户
+ */
+
+ export const getNowPlayVideo = data =>
+ axios.get('http://localhost:8004/api/monitor/now/video/now/get?', {params: {oneMinsAgeTime: data.oneMinsAgeTime}});

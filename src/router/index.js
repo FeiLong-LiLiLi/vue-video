@@ -83,7 +83,7 @@ const routes = [
 			component: userMonitoring,
 			meta: ['实时监控', '用户监控'],
 		},{
-			path: '/userMonitoring/userMonView',
+			path: '/userMonView',
 			component: userMonView,
 			meta: ['实时监控', '用户监控', '用户监控视图'],
 		},{
@@ -91,7 +91,7 @@ const routes = [
 			component: videoMonitoring,
 			meta: ['实时监控', '视频监控'],
 		},{
-			path: '/videoMonitoring/videoMonView',
+			path: '/videoMonView',
 			component: videoMonView,
 			meta: ['实时监控', '视频监控','视频监控视图'],
 		},{

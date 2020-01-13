@@ -6,10 +6,10 @@
             <router-link to = '/userMonitoring'>返回</router-link>
             <div>
                 <!-- <div>{{msg}}</div> -->
-                <el-button @click="myFunction">实时获取数据</el-button>
+                <!-- <el-button @click="updadeInfo">实时获取数据</el-button>
                 <el-button @click="monitorVideo">获取数据</el-button>
-                <el-button @click="getInfos">获取数据信息</el-button>
-                <el-button @click="monitorVideo">刷新图表</el-button>
+                <el-button @click="monitorVideo">刷新图表</el-button> -->
+                <el-button @click="test">测试</el-button>
                 <!-- <ul>
                     <li v-for="info in infos" :key="info.id">
                         <td>{{info.id}}</td>
@@ -20,7 +20,8 @@
                 </ul> -->
                 
             </div>
-            <videoInfo :infoData ='infos'></videoInfo>
+            <!-- <videoInfo :infoData ='infos'></videoInfo> -->
+            <videoInfo :infoData ='videoInfos'></videoInfo>
         </div>
     </div>
 </template>
@@ -28,113 +29,89 @@
 <script>
     import headTop from '../components/headTop'
     import videoInfo from '../components/videoInfo'
-    import {getVideoNowInfo} from '@/api/getData'
+    import {getVideoNowInfo, getNowPlayInfo} from '@/api/getData'
 
 
     
 
     export default {
         data() {
-            
             return {
                 // msg: '测试',
+                getInfo: '',
                 infos: {},
-                // infos: {
-                //     id: '',
-                //     name: '',
-                //     url: '',
-                //     county: '',
-                // },
-                // todos: [],
-                // todo: {
-                //     title: '',
-                //     completed: false
-                // }
-                // async monitorVideo(){      
-                //     try{
-                //         const res = await getVideoNowInfo();
-                //         if (res.status == 200) {
-                //             if(res.data.success == true){
-                //                 console.log(res);
-                //             }else{
-                //                 console.log(res.data.msg);
-                //             }
-                //         }
-                //     }catch(error){
-                //         console.log(error);
-                //     }
-                // },
-
+                playInfos: {},
+                videoInfos: {},
             }
-
         },
         created(){
-            this.monitorVideo();
+            this.playInfos = this.$route.query;
+            this.initData();
+            // console.log(this.$route.query);
+        },
+        watch: {
+
+            $route(to,from){
+                // console.log(from);
+                if(to.path === '/userMonView'){  
+                    this.playInfos = this.$route.query;
+                    this.initData()
+                };
+                if(from.path === '/userMonView'){
+                    // console.log('leave')
+                    this.clearUpdate();
+                   
+                }
+        	}
         },
         components: {
             headTop,
             videoInfo,
         },
-        methods: {      
-            //获取数据
-            async monitorVideo(){      
-    			try{
-    			    const res = await getVideoNowInfo();
-    				if (res.status == 200) {
+        methods: { 
+            //初始化数据格式
+            initData(){
+                this.getPlayInfo();
+                this.updadeInfo();
+            },   
+            //获取播放数据
+            async getPlayInfo(){
+                const params = {};
+                params.userId = this.playInfos.userId;
+                params.videoId = this.playInfos.videoId;
+                params.startTime = this.playInfos.startTime;
+                try {
+                    const res = await getNowPlayInfo(params);
+                    // console.log(res);
+                    if(res.status == 200){
                         if(res.data.success == true){
-                            // console.log(res);
-                            // this.infos = {};
-                            // this.infos.push(res.data.info)
-
-                             this.infos = res.data.info;
-                        }else{
-                            console.log(res.data.msg);
+                            this.videoInfos = res.data.videoInfos;
+                            // console.log(this.videoInfos);
                         }
-    				}
-    			}catch(error){
-    				console.log(error);
-    			}
-    		},
-            getInfos(){
-                // console.log(this.infos);
+                    }else{
+                        console.log(res.data.msg);
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
             },
-            // myFunction() {
-            //     setInterval('alert("Hello");', 3000);
-            // },
-            //15秒更新一次
-            myFunction() {
-                setInterval(() =>{this.monitorVideo();console.log(1)}, 15000);
-            }
-            
-            // getVideoList(){
-            //     // // console.log('获取数据');
-            //     // this.axios.get('http://jsonplaceholder.typicode.com/todos')
-            //     this.axios.get('http://localhost:8004/api/videoInfo')
-            //     // this.axios.get('/api/videoInfo')
-            //     .then(res => {
-            //         console.log(res.data); 
-            //         // this.infos = res.data;   
-            //     })
-            //     .catch(e => {
-            //         console.log(e);
-            //     })
-              
-            // },
 
+            //20秒更新一次
+            updadeInfo() {
+                this.getInfo = setInterval(() =>{this.getPlayInfo();}, 20000);
+            },  
+            //清除后台更新
+            clearUpdate(){
+                 clearInterval(this.getInfo)
+            },  
+
+            //测试用函数
+            test(){
+                this.getPlayInfo()
+            },
 
         },
-        // mounted(){
-        //     axios.get('http://jsonplaceholder.typicode.com/todos')
-        //     .then(res => {
-        //          this.todos = res.data;
-        //         // console.log(res.data);
-        //     })
-        //     .catch(e => {
-        //         console.log(e);
-                
-        //     });
-           
-        // },
+        
 
     }
 </script>

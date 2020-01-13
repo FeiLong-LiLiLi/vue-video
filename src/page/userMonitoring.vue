@@ -1,80 +1,106 @@
 <template>
     <div class="fillcontain">
         <head-top></head-top>
-        <div class="table-container">
+        <div class="page-title">用户监控</div>
+        <!-- <el-button @click="test">测试按钮</el-button> -->
+        <div class="head-button">
+            <div class="block">
+                <el-button @click="initData">实时监控</el-button>
+            </div>
+            <div class="block">
+                <el-date-picker
+                v-model="timePoint"
+                type="datetime"
+                placeholder="任意时间点">
+                </el-date-picker>
+                <el-button @click="queryTimePointUsers">查询</el-button>
+                <span class="demonstration">大于某个时间点播放</span>
+            </div>
 
-    
+            <div class="block">
+                <el-date-picker
+                v-model="oneDay"
+                align="right"
+                type="date"
+                placeholder="选择日期"
+                :picker-options="pickerOptionsDay">
+                </el-date-picker>
+                <el-button @click="queryOnedayUsers">查询</el-button> 
+                <span class="demonstration">某天播放</span>
+            </div>
+
+            <div class="block">
+                <el-date-picker
+                v-model="someTime"
+                type="datetimerange"
+                :picker-options="pickerOptionsTime"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                align="right">
+                </el-date-picker>
+                <el-button @click="querySomeTimeUsers">查询</el-button>
+                <span class="demonstration">某段时间</span> 
+            </div>
+                        
+        </div>
+            <!-- <div>{{testdate}}</div> -->
+        <div class="table-container">
             <!-- 表格信息开始 -->
              <el-table
                 :data="tableData"
-                @expand='expand'
-                :expand-row-keys='expendRow'
-                :row-key="row => row.index"
                 style="width: 100%">
-            <!-- <el-table
-                :data="tableData"
-                style="width: 100%"> -->
-                <el-table-column type="expand">
-                    <template slot-scope="props">
-                        <el-form label-position="left" inline class="demo-table-expand">
-                            <el-form-item label="用户名">
-                                <span>{{ props.row.user_name }}</span>
-                            </el-form-item>
-                            <el-form-item label="头像">
-                                <span>{{ props.row.avater }}</span>
-                            </el-form-item>
-                            <el-form-item label="用户 ID">
-                                <span>{{ props.row.user_id }}</span>
-                            </el-form-item>
-                            <el-form-item label="联系方式">
-                                <span>{{ props.row.phone }}</span>
-                            </el-form-item>
-                            <el-form-item label="电子邮箱">
-                                <span>{{ props.row.email }}</span>
-                            </el-form-item>
-                            <el-form-item label="注册时间">
-                                <span>{{ props.row.creat_time }}</span>
-                            </el-form-item>
-                            <el-form-item label="出生日期">
-                                <span>{{ props.row.date }}</span>
-                            </el-form-item>
-                            <el-form-item label="性别">
-                                <span>{{ props.row.sex }}</span>
-                            </el-form-item>
-                            <el-form-item label="个性签名">
-                                <span>{{ props.row.desc }}</span>
-                            </el-form-item>
-                        </el-form>
-                    </template>
+                <!-- <el-table-column
+                    label="日期"
+                    width="180">
+                <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                </template>
+                </el-table-column> -->
+                <el-table-column
+                    label="用户名"
+                    width="120">
+                <template slot-scope="scope">
+                     {{ scope.row.userName }}
+                </template>
                 </el-table-column>
                 <el-table-column
-                    label="序号"
-                    type="index"
+                    label="视频名"
+                    width="180">
+                <template slot-scope="scope">
+                    {{ scope.row.videoName }}
+                </template>
+                </el-table-column>
+                <el-table-column
+                    label="播放源">
+                <template slot-scope="scope">
+                   {{ scope.row.videoUrl}}
+                </template>
+                </el-table-column>
+                <el-table-column
+                    label="视频时长"
                     width="100">
-                </el-table-column>
+                <template slot-scope="scope">
+                     {{ scope.row.videoDuration }}
+                </template>
+                </el-table-column>  
                 <el-table-column
-                    label="用户名称"
-                    prop="user_name"
-                    width="200">
-                </el-table-column>
-                <el-table-column
-                    label="用户 ID"
-                    prop="user_id"
-                    width="200">
-                </el-table-column>
-                <el-table-column
-                  label="个性签名"
-                  prop="desc">
+                    label="开始播放时间"
+                    width="240">
+                <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                    <span>{{ scope.row.startTime }}</span>
+                </template>
                 </el-table-column>
                 <el-table-column label="操作">
-                    <template slot-scope="scope">
-                    <router-link to='/userMonitoring/userMonView'>
-                    <el-button
-                      size="small"
-                      type="danger"
-                      @click="enterView(scope.$index, scope.row)">进入查看</el-button>
-                    </router-link>
-                    </template>
+                <template slot-scope="scope">   
+                    <el-button 
+                    size="small"
+                    type="danger"
+                    @click="enterView(scope.$index, scope.row)"
+                    >进入查看</el-button> 
+                  </template>
                 </el-table-column>
             </el-table>
             <!-- 表格信息结束 -->
@@ -101,164 +127,164 @@
 
 <script>
     import headTop from '../components/headTop'
-    
+    import dtime from 'time-formater'
     import {baseUrl, baseImgPath} from '@/config/env'
-    // import {getFoods, getFoodsCount, getMenu, updateFood, deleteFood, getResturantDetail, getMenuById} from '@/api/getData'
+    import {getToDayUsers, getTimePointUsers, getOneDayUsers, getSomeTimeUsers} from '@/api/getData'
     export default {
         data(){
-            var checkAge = (rule, value, callback) => {
-                if (!value) {
-                return callback(new Error('年龄不能为空'));
-                }
-                setTimeout(() => {
-                if (!Number.isInteger(value)) {
-                    callback(new Error('请输入数字值'));
-                } else {
-                    if (value < 18) {
-                    callback(new Error('必须年满18岁'));
-                    } else {
-                    callback();
-                    }
-                }
-                }, 1000);
-            };
-            var validatePass = (rule, value, callback) => {
-                if (value === '') {
-                callback(new Error('请输入密码'));
-                } else {
-                if (this.ruleForm.checkPass !== '') {
-                    this.$refs.ruleForm.validateField('checkPass');
-                }
-                callback();
-                }
-            };
-            var validatePass2 = (rule, value, callback) => {
-                if (value === '') {
-                callback(new Error('请再次输入密码'));
-                } else if (value !== this.ruleForm.pass) {
-                callback(new Error('两次输入密码不一致!'));
-                } else {
-                callback();
-                }
-            };
             return {
-                baseUrl,
-                baseImgPath,
-
-                restaurant_id: null,
-                city: {},
-
-                // 查询
-                search_user: '',
-
+                infos: '',
                 tableData: [{
-                    user_name: '好滋好味',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '123',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'
-                    },{
-                    user_name: '好滋好味鸡蛋',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '456',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'
-                    },{
-                    user_name: '好滋好味鸡蛋仔',
-                    avater: '头像位置',
-                    sex: '男',
-                    user_id: '789',
-                    phone: '13111111111',
-                    email: '13412@qq.com',
-                    creat_time: '2016-09-01',
-                    date: '2000-01-01',
-                    desc: '呵呵呵呵呵呵额呵呵这是个性签名'   
-                }],
+                    date: '2016-05-01',
+                    userName: '王小虎',
+                    videoName: '最新资讯',
+                    videoUrl: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                    date: '2016-05-02',
+                    userName: '王小虎',
+                    videoName: '最新资讯',
+                    videoUrl: '上海市普陀区金沙江路 1518 弄'
+                },],
+
+                pickerOptionsDay: {
+                    shortcuts: [{
+                        text: '今天',
+                        onClick(picker) {
+                        picker.$emit('pick', new Date());
+                        }
+                    }, {
+                        text: '昨天',
+                        onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24);
+                        picker.$emit('pick', date);
+                        }
+                    }, {
+                        text: '一周前',
+                        onClick(picker) {
+                        const date = new Date();
+                        date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', date);
+                        }
+                    }]
+                },
+                pickerOptionsTime: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                },
+                timePoint: '',
+                oneDay: '',
+                someTime: '',
+              
 
                 // 分页
                 currentRow: null,
                 offset: 0,
                 currentPage: 1, 
                 limit: 20,
-                count: 200,
-
-                
-                dialogFormVisible: false,   //编辑页面
-                dialogFormVisible_adduser: false,   //添加用户
-
-          
-                updataUserInfo: {},
-
-
-                // 新增用户信息
-                ruleForm: {
-                    name: '',
-                    email: '',
-                    phone: '',
-                    pass: '',
-                    checkPass: '',
-                    radio: 9,
-                    age: '',
-                },
-                rules: {
-                    name: [
-                        { required: true, message: '请输入用户名', trigger: 'blur' },
-                        { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-                    ],
-                    email:[
-                        { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-                        { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
-                    ],
-                    phone:[
-                        // { required: true, message: '请输入正确的手机号码', trigger: 'blur' },
-                        // { type: 'number', message: '电话号码必须是数字'}
-                        { required: true, message: '请输入联系电话'},
-						{ type: 'number', message: '电话号码必须是数字' }
-                    ],
-                    pass: [
-                        { required: true, validator: validatePass, trigger: 'blur' }
-                    ],
-                    checkPass: [
-                        { required: true, validator: validatePass2, trigger: 'blur' }
-                    ],
-                    age: [
-                        { validator: checkAge, trigger: 'blur' }
-                    ]
-                },
-
-                 //日期
-                pickerOptions1: {
-                    disabledDate(time) {
-                    return time.getTime() > Date.now();
-                    },
-                },
-                value1: '',
+                count: 200, 
                 expendRow: [],
 
-                // 无用
-                selectTable: {},
-                menuOptions: [],
-                selectMenu: {},
-                selectIndex: null,
             }
         },
-  
+        created(){
+            this.initData();
+        },
+        watch: {
+            $route(to,from){
+                if(to.path === '/userMonitoring'){ 
+                    // console.log('enter'); 
+                    this.initData()
+                };
+                if(from.path === '/userMonitoring'){
+                    // console.log('leave')
+                    this.clearMonitorUser();
+                   
+                }
+               
+        	}
+        },
         computed: {
-    
+            
         },
     	components: {
     		headTop,
     	},
         methods: {
- 
+            initData(){
+                this.initUsersData();
+                this.monitorUser();
+            },
+
+             //20秒实时更新
+            monitorUser(){
+                this.infos = setInterval(() => {
+                    this.initUsersData()
+                    // console.log(111)
+                }, 20*1000);
+            },
+
+            //取消清除实时更新
+            clearMonitorUser(){
+                clearInterval(this.infos);
+            },
+            
+            async initUsersData(){
+                try {
+                    const timePoint = dtime(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
+                    const oneMinsAgeTime = this.getOneAgeTime(timePoint);
+                    const today = dtime(oneMinsAgeTime).format('YYYY-MM-DD');
+                    const params = {oneMinsAgeTime: oneMinsAgeTime, today: today}
+                    const res = await getTimePointUsers(params);
+                    // console.log(res)
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.playUsers.forEach(item => {
+                                const tableItem = {
+                                    date :  dtime(item.start_date).format('YYYY-MM-DD'),
+                                    userId : item.user_id,
+                                    userName : item.user_name,
+                                    videoId : item.video_id,
+                                    videoName : item.video_name,
+                                    videoUrl : item.video_url,
+                                    videoDuration: item.video_duration,
+                                    startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+
             
             // 分页
             handleSizeChange(val) {
@@ -269,112 +295,155 @@
                 this.offset = (val - 1)*this.limit;
                 // this.getFoods()
             },
-
+            
             expand(row, status){
             	if (status) {
-            		// this.getSelectItemData(row)
+            		this.getSelectItemData(row)
             	}else{
                     const index = this.expendRow.indexOf(row.index);
                     this.expendRow.splice(index, 1)
                 }
             },
+
             enterView(index,row){
-                console.log(index, row, '进入用户视图');
-            },
-
- 
-
-            getSelectItemUserData(row, type){
-                console.log("获取的信息");
-                console.log(row);
-                // console.log(row.user_name);
-                const updataUserInfo = {};
-                updataUserInfo.user_name = row.user_name;
-                updataUserInfo.push()
-                console.log(updataUserInfo.user_name);
-
-
-            },
-
-
-            beforeAvatarUpload(file) {
-                const isRightType = (file.type === 'image/jpeg') || (file.type === 'image/png');
-                const isLt2M = file.size / 1024 / 1024 < 2;
-
-                if (!isRightType) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!');
-                }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
-                }
-                return isRightType && isLt2M;
-            },
-
-            //测试获取信息
-            getInfo(row){
-                console.log("111");
-                console.log(row);
-                // console.log(tableData);
-            },
-            // 更新数据
-            updateUserInfo(){
-                console.log("呵呵，这是更新");
-                this.dialogFormVisible = false;
-            },
-            
-            //对话框关闭
-            handleClose(done,formName) {
-                this.$confirm('是否保存数据？')
-                .then(_ => {
-                    // this.$refs[formName].resetFields();
-                    done();
-                })
-                .catch(_ => {});
-            },
-
-            // 增加
-            addUserInfo(formName){
-                // alert("1111");
-                console.log("增加");
-                // this.resetForm(formName);
-                this.dialogFormVisible_adduser = true;
-            },
-            // 重置添加
-            resetForm(formName) { 
-                // console.log(formName);
-                // resetFields();    
-                this.$refs[formName].resetFields();   
-            },
-            // 取消添加用户
-            cancelAddUser(formName){
-                // this.resetForm(formName);
-                this.dialogFormVisible_adduser = false; 
-                console.log("取消");
-            },
-            
-            //提交添加用户
-            submitAddUser(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        console.log(formName);
-                        this.resetForm(formName);
-                        this.dialogFormVisible_adduser = false;
-                        console.log("提交成功");
-                        // alert('submit!');           
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
+                // console.log(index, row);
+                this.$router.push({
+                    path: 'userMonView',
+                    query: row
                 });
                 
             },
             
+            //获取一分钟前时间
+            getOneAgeTime(time){ 
+                const nowTime = dtime(time).format('x');
+                const oneMinsAgeTime = dtime(nowTime-60*1000).format('YYYY-MM-DD HH:mm:ss')
+                return oneMinsAgeTime;
+            },
+
+            //某时播放
+            async queryTimePointUsers(){
+                try {
+                    this.clearMonitorUser();
+                    const oneMinsAgeTime = this.getOneAgeTime(this.timePoint);
+                    const today = dtime(oneMinsAgeTime).format('YYYY-MM-DD');
+                    const params = {oneMinsAgeTime: oneMinsAgeTime, today: today}
+                    const res = await getTimePointUsers(params);
+                    // console.log(res)
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.playUsers.forEach(item => {
+                                const tableItem = {
+                                    date :  dtime(item.start_date).format('YYYY-MM-DD'),
+                                    userId : item.user_id,
+                                    userName : item.user_name,
+                                    videoId : item.video_id,
+                                    videoName : item.video_name,
+                                    videoUrl : item.video_url,
+                                    videoDuration: item.video_duration,
+                                    startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+
+            },
+
+            //某天播放
+            async queryOnedayUsers(){
+                try {
+                    this.clearMonitorUser();
+                    const params = {};
+                    params.oneDay = dtime(this.oneDay).format('YYYY-MM-DD');
+                    const res = await getOneDayUsers(params);
+                    // console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.playUsers.forEach(item => {
+                                const tableItem = {
+                                    date :  dtime(item.start_date).format('YYYY-MM-DD'),
+                                    userId : item.user_id,
+                                    userName : item.user_name,
+                                    videoId : item.video_id,
+                                    videoName : item.video_name,
+                                    videoUrl : item.video_url,
+                                    videoDuration: item.video_duration,
+                                    startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                            // console.log(this.tableData)
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+
+            //某段时间播放
+            async querySomeTimeUsers(){
+                try {
+                    this.clearMonitorUser();
+                    const params = {
+                        startTime: dtime(this.someTime[0]).format('YYYY-MM-DD HH:mm:ss'),
+                        endTime: dtime(this.someTime[1]).format('YYYY-MM-DD HH:mm:ss')
+                    }
+                    console.log(params);
+                    const res = await getSomeTimeUsers(params);
+                    console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.playUsers.forEach(item => {
+                                const tableItem = {
+                                    date :  dtime(item.start_date).format('YYYY-MM-DD'),
+                                    userId : item.user_id,
+                                    userName : item.user_name,
+                                    videoId : item.video_id,
+                                    videoName : item.video_name,
+                                    videoUrl : item.video_url,
+                                    videoDuration: item.video_duration,
+                                    startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                            // console.log(this.tableData)
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            test(){
+            
+                // console.log(dtime(this.timePoint).format('YYYY-MM-DD HH:mm:ss'));
+                // console.log(dtime(this.timePoint).format('YYYY-MM-DD HH:mm:ss'));
+                // console.log(dtime(this.oneDay).format('YYYY-MM-DD HH:mm:ss'));
+                // console.log(dtime(this.someTime[0]).format('YYYY-MM-DD HH:mm:ss'),this.someTime[1]);
+            },
         },
     }
 </script>
 
 <style lang="less">
-	@import '../style/mixin';
+    @import '../style/mixin';
+    .page-title{
+        font-size: 30px;
+        text-align: center;
+        padding: 20px;
+    }
     .demo-table-expand {
         font-size: 0;
     }

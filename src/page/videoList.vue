@@ -266,6 +266,7 @@
 
 <script>
     import headTop from '../components/headTop'
+    import dtime from 'time-formater'
     import {baseUrl, baseImgPath} from '@/config/env'
     import {getVideosCount, getAllVideos, addVideo, delVideo, updateVideo, queryVideoCount, queryVideoAll, getAllTags, getAllCategories} from '@/api/getData'
     export default {
@@ -450,8 +451,8 @@
                                 video_id: item.video_id,
                                 name: item.name,
                                 cover: item.cover,
-                                creat_time: item.creat_time,
-                                modify_time: item.modify_time,
+                                creat_time: dtime(item.creat_time).format('YYYY-MM-DD'),
+                                modify_time: dtime(item.modify_time).format('YYYY-MM-DD'),
                                 category: item.category,
                                 tag: item.tag,
                                 video_desc: item.video_desc,
@@ -588,8 +589,8 @@
                     const res = await updateVideo(params);;
                     if(res.status == 200){
                         if(res.data.success == true){
-                            params.creat_time = res.data.video.creat_time;
-                            params.modify_time = res.data.video.modify_time;
+                            params.creat_time = dtime(res.data.video.creat_time).format('YYYY-MM-DD');
+                            params.modify_time = dtime(res.data.video.modify_time).format('YYYY-MM-DD');
                             params.link = res.data.video.link;
                             this.tableData.splice(formName.index, 1, params);
                             this.$message({
@@ -762,8 +763,8 @@
                                     video_id: item.video_id,
                                     name: item.name,
                                     cover: item.cover,
-                                    creat_time: item.creat_time,
-                                    modify_time: item.modify_time,
+                                    creat_time: dtime(item.creat_time).format('YYYY-MM-DD'),
+                                    modify_time: dtime(item.modify_time).format('YYYY-MM-DD'),
                                     category: item.category,
                                     tag: item.tag,
                                     video_desc: item.video_desc,

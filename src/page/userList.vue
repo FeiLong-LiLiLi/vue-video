@@ -211,6 +211,7 @@
 
 <script>
     import headTop from '../components/headTop'
+    import dtime from 'time-formater'
     import {baseUrl, baseImgPath} from '@/config/env'
     import {getUsersCount, getAllUsers, addUser, delUser, updateUser, queryUserCount, queryUserAll} from '@/api/getData'
     export default {
@@ -373,8 +374,8 @@
                                     name: item.name,
                                     phone: item.phone,
                                     email: item.email,
-                                    creat_time: item.creat_time.substring(0, 11),
-                                    birth: item.birth,
+                                    creat_time: dtime(item.creat_time).format('YYYY-MM-DD'),
+                                    birth:  dtime(item.birth).format('YYYY-MM-DD'),
                                     sex: item.sex,
                                     personal_signature: item.personal_signature,
                                 }
@@ -506,7 +507,8 @@
                     if(res.status == 200){
                         if(res.data.success == true){
                             const resData = res.data.user;
-                            resData.creat_time = res.data.user.creat_time.substring(0, 11);
+                            resData.creat_time = dtime(res.data.user.creat_time).format('YYYY-MM-DD');
+                            resData.birth = dtime(res.data.user.birth).format('YYYY-MM-DD');
                             this.tableData.splice(selectTable.index, 1, resData);
                             this.$message({
                                 showClose: true,
@@ -630,8 +632,8 @@
                                     name: item.name,
                                     phone: item.phone,
                                     email: item.email,
-                                    creat_time: item.creat_time.substring(0, 11),
-                                    birth: item.birth,
+                                    creat_time: dtime(item.creat_time).format('YYYY-MM-DD'),
+                                    birth: dtime(item.birth).format('YYYY-MM-DD'),
                                     sex: item.sex,
                                     personal_signature: item.personal_signature,
                                 }

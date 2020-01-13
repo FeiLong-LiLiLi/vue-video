@@ -5,8 +5,8 @@
 </template>
 
 <script>
+    import dtime from 'time-formater';
     import echarts from 'echarts/lib/echarts';
-    // 引入柱状图
     import 'echarts/lib/chart/bar';
     import 'echarts/lib/chart/line';
     import 'echarts/lib/component/tooltip';
@@ -19,15 +19,24 @@
     export default {
         data(){
             return{
-                abitrate: [],
-                abuffer: [],
-                adframes: [],
-                aratio: [],
-                vbitrate: [],
-                vbuffer: [],
-                vdframes: [],
-                vratio: [],
-                time:[]
+                videoRatioArray: '',
+                audioRatioArray: '',
+                videoTime: [],
+                videoBitrateDownloading: [],
+                videoBufferLength: [],
+                videoDroppedFrames: [],
+                videoRatio: [],
+                audioBitrateDownloading: [],
+                audioBufferLength: [],
+                audioDroppedFrames: [],
+                audioRatio: [],
+                nowTime: [],
+                videoRatioMix: [],
+                videoRatioAvg: [],
+                videoRatioMax: [],           
+                audioRatioMix: [],
+                audioRatioAvg: [],
+                audioRatioMax: [],
             }
         },
         mounted(){
@@ -36,32 +45,59 @@
         },
         props: ['infoData'],
         methods: {
-            
+            //处理Ratio
+            dealVideoRatioArray(arr){
+                for(let i = 0; i < arr.length; i++){
+                    this.videoRatioArray = arr[i].split('|');
+                    this.videoRatioMix.push(this.videoRatioArray[0])
+                    this.videoRatioAvg.push(this.videoRatioArray[1])
+                    this.videoRatioMax.push(this.videoRatioArray[2])
+                }
+            },
+            dealAudioRatioArray(arr){
+                 for(let i = 0; i < arr.length; i++){
+                    this.audioRatioArray = arr[i].split('|');
+                    this.audioRatioMix.push(this.audioRatioArray[0])
+                    this.audioRatioAvg.push(this.audioRatioArray[1])
+                    this.audioRatioMax.push(this.audioRatioArray[2])
+                }
+            },
+
             //获取数据
             getData(){
-                this.abitrate = [];
-                this.abuffer = [];
-                this.adframes = [];
-                this.aratio = [];
-                this.vbitrate = [];
-                this.vbuffer = [];
-                this.vdframes = [];
-                this.vratio = [];
-                this.time = [];
+                this.videoTime = [];
+                this.videoBitrateDownloading = [];
+                this.videoBufferLength = [];
+                this.videoDroppedFrames = [];
+                this.videoRatio = [];
+                this.audioBitrateDownloading = [];
+                this.audioBufferLength = [];
+                this.audioDroppedFrames = [];
+                this.audioRatio = [];
+                this.nowTime = [];
+                this.videoRatioMix = [];
+                this.videoRatioAvg = [];
+                this.videoRatioMax = [];           
+                this.audioRatioMix = [];
+                this.audioRatioAvg = [];
+                this.audioRatioMax = [];
                 //遍历数组
                 for(var i = 0; i < this.infoData.length; i++){
-                    this.abitrate.push(this.infoData[i].abitrate);
-                    this.abuffer.push(this.infoData[i].abuffer);
-                    this.adframes.push(this.infoData[i].adframes);
-                    this.aratio.push(this.infoData[i].aratio);
-                    this.vbitrate.push(this.infoData[i].vbitrate);
-                    this.vbuffer.push(this.infoData[i].vbuffer);
-                    this.vdframes.push(this.infoData[i].vdframes);
-                    this.vratio.push(this.infoData[i].vratio);
-                    this.time.push(this.infoData[i].time.slice(11,19));
+                    this.videoTime.push(this.infoData[i].video_time);
+                    this.videoBitrateDownloading.push(this.infoData[i].video_bitrate_downloading);
+                    this.videoBufferLength.push(this.infoData[i].video_buffer_length);
+                    this.videoDroppedFrames.push(this.infoData[i].video_dropped_frames);
+                    this.videoRatio.push(this.infoData[i].video_ratio);
+                    this.audioBitrateDownloading.push(this.infoData[i].audio_bitrate_downloading);
+                    this.audioBufferLength.push(this.infoData[i].audio_buffer_length);
+                    this.audioDroppedFrames.push(this.infoData[i].audio_dropped_frames);
+                    this.audioRatio.push(this.infoData[i].audio_ratio);
+                    this.nowTime.push(dtime(this.infoData[i].now_time).format('HH:mm:ss'));
                 }
-                // console.log(this.time);
                 
+                this.dealVideoRatioArray(this.videoRatio);
+                this.dealAudioRatioArray(this.audioRatio);     
+                // console.log(this.audioRatio);     
             },
 
             initData(){
@@ -74,9 +110,14 @@
                     tooltip: {
                         trigger: 'axis'
                     },
-                    legend: {
-                        data: ['abitrate', 'abuffer', 'adframes', 'aratio', 'vbitrate', 'vbuffer', 'vdframes', 'vratio']
-                    },
+                    legend: [{
+                            data: ['Video Bitrate Downloading', 'Video Buffer Length', 'Video Dropped Frames', 'Video Ratio(Mix)', 'Video Ratio(Avg)', 'Video Ratio(Max)']
+                        },{
+                            top: '30',
+                            bottom: '30',
+                            data: ['Audio Bitrate Downloading', 'Audio Buffer Length', 'Audio Dropped Frames', 'Audio Ratio(Mix)', 'Audio Ratio(Avg)', 'Audio Ratio(Max)']
+                        }
+                    ],
                     grid: {
                         left: '3%',
                         right: '4%',
@@ -88,68 +129,96 @@
                             saveAsImage: {}
                         }
                     },
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        // data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-                        data: this.time
-                    },
+                     xAxis: [{
+                            type: 'category',
+                            boundaryGap: false,
+                            data: this.nowTime
+                        },
+                        {
+                            data: this.videoTime
+                        }
+
+                    ],
                     yAxis: {
                         type: 'value'
                     },
                     series: [
                         {
-                            name: 'abitrate',
+                            name: 'Video Bitrate Downloading',
                             type: 'line',
                             stack: '总量',
-                            data: this.abitrate
+                            data: this.videoBitrateDownloading,
                         },
                         {
-                            name: 'abuffer',
+                            name: 'Video Buffer Length',
                             type: 'line',
                             stack: '总量',
-                            data: this.abuffer,
+                            data: this.videoBufferLength,
                         },
                         {
-                            name: 'adframes',
+                            name: 'Video Dropped Frames',
                             type: 'line',
                             stack: '总量',
-                            data: this.adframes,
+                            data: this.videoDroppedFrames,
                         },
                         {
-                            name: 'aratio',
+                            name: 'Video Ratio(Mix)',
                             type: 'line',
                             stack: '总量',
-                            data: this.aratio,
+                            data: this.videoRatioMix,
                         },
                         {
-                            name: 'vbitrate',
+                            name: 'Video Ratio(Avg)',
                             type: 'line',
                             stack: '总量',
-                            data: this.vbitrate,
+                            data: this.videoRatioAvg,
                         },
                         {
-                            name: 'vbuffer',
+                            name: 'Video Ratio(Max)',
                             type: 'line',
                             stack: '总量',
-                            data: this.vbuffer,
+                            data: this.videoRatioMax,
                         },
                         {
-                            name: 'vdframes',
+                            name: 'Audio Bitrate Downloading',
                             type: 'line',
                             stack: '总量',
-                            data: this.vdframes,
+                            data: this.audioBitrateDownloading,
                         },
                         {
-                            name: 'vratio',
+                            name: 'Audio Buffer Length',
                             type: 'line',
                             stack: '总量',
-                            data: this.vratio,
+                            data: this.audioBufferLength,
+                        },
+                        {
+                            name: 'Audio Dropped Frames',
+                            type: 'line',
+                            stack: '总量',
+                            data: this.audioDroppedFrames,
+                        },
+                        {
+                            name: 'Audio Ratio(Mix)',
+                            type: 'line',
+                            stack: '总量',
+                            data: this.audioRatioMix,
+                        },
+                        {
+                            name: 'Audio Ratio(Avg)',
+                            type: 'line',
+                            stack: '总量',
+                            data: this.audioRatioAvg,
+                        },
+                        {
+                            name: 'Audio Ratio(Max)',
+                            type: 'line',
+                            stack: '总量',
+                            data: this.audioRatioMax,
                         }
                     ]
                 };
-
-                this.myChart.setOption(option);
+                // this.myChart.clear();
+                this.myChart.setOption(option, false);
             }
         },
         watch: {
@@ -163,9 +232,9 @@
 <style lang="less">
 	@import '../style/mixin';
     .video-categories{
-        display: flex;
+        display: block;
         justify-content: center;
-        width: 80%;
+        width: 90%;
         height:450px;
         margin: 0 auto;
         padding: 5px;
