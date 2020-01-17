@@ -1,6 +1,6 @@
 <template>
     <!-- <div class="visitorpie"> -->
-        <div id="video-categories" class="video-categories"> </div>
+        <div id="video-infos" class="video-infos"> </div>
     <!-- </div> -->
 </template>
 
@@ -20,27 +20,27 @@
         data(){
             return{
                 videoRatioArray: '',
-                audioRatioArray: '',
+                // audioRatioArray: '',
                 videoTime: [],
                 videoBitrateDownloading: [],
                 videoBufferLength: [],
                 videoDroppedFrames: [],
                 videoRatio: [],
-                audioBitrateDownloading: [],
-                audioBufferLength: [],
-                audioDroppedFrames: [],
-                audioRatio: [],
+                // audioBitrateDownloading: [],
+                // audioBufferLength: [],
+                // audioDroppedFrames: [],
+                // audioRatio: [],
                 nowTime: [],
                 videoRatioMix: [],
                 videoRatioAvg: [],
                 videoRatioMax: [],           
-                audioRatioMix: [],
-                audioRatioAvg: [],
-                audioRatioMax: [],
+                // audioRatioMix: [],
+                // audioRatioAvg: [],
+                // audioRatioMax: [],
             }
         },
         mounted(){
-            this.myChart = echarts.init(document.getElementById('video-categories'));
+            this.myChart = echarts.init(document.getElementById('video-infos'));
             this.initData();
         },
         props: ['infoData'],
@@ -54,14 +54,14 @@
                     this.videoRatioMax.push(this.videoRatioArray[2])
                 }
             },
-            dealAudioRatioArray(arr){
-                 for(let i = 0; i < arr.length; i++){
-                    this.audioRatioArray = arr[i].split('|');
-                    this.audioRatioMix.push(this.audioRatioArray[0])
-                    this.audioRatioAvg.push(this.audioRatioArray[1])
-                    this.audioRatioMax.push(this.audioRatioArray[2])
-                }
-            },
+            // dealAudioRatioArray(arr){
+            //      for(let i = 0; i < arr.length; i++){
+            //         this.audioRatioArray = arr[i].split('|');
+            //         this.audioRatioMix.push(this.audioRatioArray[0])
+            //         this.audioRatioAvg.push(this.audioRatioArray[1])
+            //         this.audioRatioMax.push(this.audioRatioArray[2])
+            //     }
+            // },
 
             //获取数据
             getData(){
@@ -70,17 +70,17 @@
                 this.videoBufferLength = [];
                 this.videoDroppedFrames = [];
                 this.videoRatio = [];
-                this.audioBitrateDownloading = [];
-                this.audioBufferLength = [];
-                this.audioDroppedFrames = [];
-                this.audioRatio = [];
+                // this.audioBitrateDownloading = [];
+                // this.audioBufferLength = [];
+                // this.audioDroppedFrames = [];
+                // this.audioRatio = [];
                 this.nowTime = [];
                 this.videoRatioMix = [];
                 this.videoRatioAvg = [];
                 this.videoRatioMax = [];           
-                this.audioRatioMix = [];
-                this.audioRatioAvg = [];
-                this.audioRatioMax = [];
+                // this.audioRatioMix = [];
+                // this.audioRatioAvg = [];
+                // this.audioRatioMax = [];
                 //遍历数组
                 for(var i = 0; i < this.infoData.length; i++){
                     this.videoTime.push(this.infoData[i].video_time);
@@ -88,15 +88,15 @@
                     this.videoBufferLength.push(this.infoData[i].video_buffer_length);
                     this.videoDroppedFrames.push(this.infoData[i].video_dropped_frames);
                     this.videoRatio.push(this.infoData[i].video_ratio);
-                    this.audioBitrateDownloading.push(this.infoData[i].audio_bitrate_downloading);
-                    this.audioBufferLength.push(this.infoData[i].audio_buffer_length);
-                    this.audioDroppedFrames.push(this.infoData[i].audio_dropped_frames);
-                    this.audioRatio.push(this.infoData[i].audio_ratio);
+                    // this.audioBitrateDownloading.push(this.infoData[i].audio_bitrate_downloading);
+                    // this.audioBufferLength.push(this.infoData[i].audio_buffer_length);
+                    // this.audioDroppedFrames.push(this.infoData[i].audio_dropped_frames);
+                    // this.audioRatio.push(this.infoData[i].audio_ratio);
                     this.nowTime.push(dtime(this.infoData[i].now_time).format('HH:mm:ss'));
                 }
                 
                 this.dealVideoRatioArray(this.videoRatio);
-                this.dealAudioRatioArray(this.audioRatio);     
+                // this.dealAudioRatioArray(this.audioRatio);     
                 // console.log(this.audioRatio);     
             },
 
@@ -105,18 +105,19 @@
                 // const colors = ['#5793f3', '#f7ba2a', '#d14a61', '#e0fa52', '#97a8be'];
                 const option = {
                     title: {
-                        text: '折线图堆叠'
+                        text: '视频信息图'
                     },
                     tooltip: {
                         trigger: 'axis'
                     },
                     legend: [{
                             data: ['Video Bitrate Downloading', 'Video Buffer Length', 'Video Dropped Frames', 'Video Ratio(Mix)', 'Video Ratio(Avg)', 'Video Ratio(Max)']
-                        },{
-                            top: '30',
-                            bottom: '30',
-                            data: ['Audio Bitrate Downloading', 'Audio Buffer Length', 'Audio Dropped Frames', 'Audio Ratio(Mix)', 'Audio Ratio(Avg)', 'Audio Ratio(Max)']
-                        }
+                        },
+                        // {
+                        //     top: '30',
+                        //     bottom: '30',
+                        //     data: ['Audio Bitrate Downloading', 'Audio Buffer Length', 'Audio Dropped Frames', 'Audio Ratio(Mix)', 'Audio Ratio(Avg)', 'Audio Ratio(Max)']
+                        // }
                     ],
                     grid: {
                         left: '3%',
@@ -129,12 +130,15 @@
                             saveAsImage: {}
                         }
                     },
-                     xAxis: [{
-                            type: 'category',
-                            boundaryGap: false,
-                            data: this.nowTime
-                        },
+                     xAxis: [
+                        //  {
+                        //     type: 'category',   
+                        //     boundaryGap: false,
+                        //     data: this.nowTime
+                        // },
                         {
+                            type: 'category',   
+                            boundaryGap: false,
                             data: this.videoTime
                         }
 
@@ -179,46 +183,46 @@
                             stack: '总量',
                             data: this.videoRatioMax,
                         },
-                        {
-                            name: 'Audio Bitrate Downloading',
-                            type: 'line',
-                            stack: '总量',
-                            data: this.audioBitrateDownloading,
-                        },
-                        {
-                            name: 'Audio Buffer Length',
-                            type: 'line',
-                            stack: '总量',
-                            data: this.audioBufferLength,
-                        },
-                        {
-                            name: 'Audio Dropped Frames',
-                            type: 'line',
-                            stack: '总量',
-                            data: this.audioDroppedFrames,
-                        },
-                        {
-                            name: 'Audio Ratio(Mix)',
-                            type: 'line',
-                            stack: '总量',
-                            data: this.audioRatioMix,
-                        },
-                        {
-                            name: 'Audio Ratio(Avg)',
-                            type: 'line',
-                            stack: '总量',
-                            data: this.audioRatioAvg,
-                        },
-                        {
-                            name: 'Audio Ratio(Max)',
-                            type: 'line',
-                            stack: '总量',
-                            data: this.audioRatioMax,
-                        }
+                        // {
+                        //     name: 'Audio Bitrate Downloading',
+                        //     type: 'line',
+                        //     stack: '总量',
+                        //     data: this.audioBitrateDownloading,
+                        // },
+                        // {
+                        //     name: 'Audio Buffer Length',
+                        //     type: 'line',
+                        //     stack: '总量',
+                        //     data: this.audioBufferLength,
+                        // },
+                        // {
+                        //     name: 'Audio Dropped Frames',
+                        //     type: 'line',
+                        //     stack: '总量',
+                        //     data: this.audioDroppedFrames,
+                        // },
+                        // {
+                        //     name: 'Audio Ratio(Mix)',
+                        //     type: 'line',
+                        //     stack: '总量',
+                        //     data: this.audioRatioMix,
+                        // },
+                        // {
+                        //     name: 'Audio Ratio(Avg)',
+                        //     type: 'line',
+                        //     stack: '总量',
+                        //     data: this.audioRatioAvg,
+                        // },
+                        // {
+                        //     name: 'Audio Ratio(Max)',
+                        //     type: 'line',
+                        //     stack: '总量',
+                        //     data: this.audioRatioMax,
+                        // }
                     ]
                 };
                 // this.myChart.clear();
-                this.myChart.setOption(option, false);
+                this.myChart.setOption(option);
             }
         },
         watch: {
@@ -231,14 +235,14 @@
 
 <style lang="less">
 	@import '../style/mixin';
-    .video-categories{
+    .video-infos{
         display: block;
         justify-content: center;
         width: 90%;
         height:450px;
         margin: 0 auto;
         padding: 5px;
-        position: relative;
+        // position: relative;
         // margin: 20px;
         // float: left;
     }

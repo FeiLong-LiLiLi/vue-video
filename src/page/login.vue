@@ -27,7 +27,7 @@
 <script>
 	import {login, getAdminInfo, initSevenData} from '@/api/getData'
 	import dtime from 'time-formater'
-	import {mapActions, mapState} from 'vuex'
+	// import {mapActions, mapState} from 'vuex'
 
 	export default {
 	    data(){
@@ -49,15 +49,26 @@
 		},
 		mounted(){
 			this.showLogin = true;
-			if (!this.adminInfo.id) {
-    			this.getAdminData()
-    		}
+			// if (!this.adminInfo.id) {
+    		// 	this.getAdminData()
+    		// }
+		},
+		watch: {
+			// adminInfo: function (newValue){
+			// 	if (newValue.id) {
+			// 		this.$message({
+            //             type: 'success',
+            //             message: '检测到您之前登录过，将自动登录'
+            //         });
+			// 		this.$router.push('manage')
+			// 	}
+			// }
 		},
 		computed: {
-			...mapState(['adminInfo']),
+			// ...mapState(['adminInfo']),
 		},
 		methods: {
-			...mapActions(['getAdminData']),
+			// ...mapActions(['getAdminData']),
 			async submitForm(formName) {
 				// console.log(formName.email)
 				if(formName.email != '' && formName.psw != ''){
@@ -67,12 +78,20 @@
 						// console.log(res);
 						if(res.status == 200){
 							if(res.data.success == true){
+								this.initSevenDay();
+								
+								const data = res.data.session.user;
+								// console.log(data);
+								this.setCookie(data.name,data.admin_id,data.psw,res.data.sessionID,1)
 								this.$message({
 									showClose: true,
 									message: res.data.msg,
 									type: 'success'
 								});
-								this.initSevenDay();
+								// this.$router.push({
+								// 	path: 'manage',
+								// 	// params: res.data
+								// });
 							}
 							else{
 							this.$message({
@@ -96,13 +115,24 @@
 				
 			},
 
+			//设置cookie
+			setCookie(adminName, adminId, adminPassWord, sessionId,exdays) {
+                var exdate = new Date(); //获取时间
+                exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays); //保存的天数
+                //字符串拼接cookie
+                window.document.cookie = "adminName" +"="+ adminName +";path=/;expires=" + exdate.toGMTString();
+				window.document.cookie = "adminId" +"="+ adminId +";path=/;expires=" + exdate.toGMTString();
+				window.document.cookie = "adminPassWord" +"="+ adminPassWord +";path=/;expires=" + exdate.toGMTString();
+				window.document.cookie = "sessionId" +"="+ sessionId + ";path=/;expires=" + exdate.toGMTString();
+            },
+
 			//初始化数据
 			async initSevenDay(){
 				this.sevenDay = [];
 				for (let i = 6; i > -1; i--) {
 					const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
 					this.sevenDay.push(date);
-					// console.log(date);
+					console.log(date);
 					// console.log(this.sevenDay);
 					try {	
 						const params = {today : date}
@@ -116,14 +146,14 @@
 									type: 'error'
 								});
 							}
-							this.$router.push('manage');
+							// this.$router.push('manage');
 						}else{
 							this.$message({
 								showClose: true,
 								message: '初始化数据失败',
 								type: 'error'
 							});
-							this.$router.push('manage');
+							// this.$router.push('manage');
 						}
 
 					}catch (error) {
@@ -132,17 +162,7 @@
 				}
 			},
 		},
-		watch: {
-			adminInfo: function (newValue){
-				if (newValue.id) {
-					this.$message({
-                        type: 'success',
-                        message: '检测到您之前登录过，将自动登录'
-                    });
-					this.$router.push('manage')
-				}
-			}
-		}
+		
 	}
 </script>
 

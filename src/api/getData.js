@@ -508,4 +508,12 @@ axios.get('http://localhost:8004/api/monitor/now/play/someTime/get', {params: {s
  */
 
  export const getNowPlayVideo = data =>
- axios.get('http://localhost:8004/api/monitor/now/video/now/get?', {params: {oneMinsAgeTime: data.oneMinsAgeTime}});
+ axios.get('http://localhost:8004/api/monitor/now/video/now/get', {params: {oneMinsAgeTime: data.oneMinsAgeTime}});
+
+
+/**
+ * 获取当前正在观看某视频的用户
+ */
+
+export const getNowPlayUsers = data =>
+axios.get('http://localhost:8004/api/monitor/now/play/users/get', {params: {today: data.today, nowTime: data.nowTime, videoId: data.videoId}})

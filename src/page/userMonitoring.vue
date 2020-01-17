@@ -2,7 +2,7 @@
     <div class="fillcontain">
         <head-top></head-top>
         <div class="page-title">用户监控</div>
-        <!-- <el-button @click="test">测试按钮</el-button> -->
+        <el-button @click="test">测试按钮</el-button>
         <div class="head-button">
             <div class="block">
                 <el-button @click="initData">实时监控</el-button>
@@ -11,6 +11,7 @@
                 <el-date-picker
                 v-model="timePoint"
                 type="datetime"
+                clearable
                 placeholder="任意时间点">
                 </el-date-picker>
                 <el-button @click="queryTimePointUsers">查询</el-button>
@@ -22,6 +23,7 @@
                 v-model="oneDay"
                 align="right"
                 type="date"
+                clearable
                 placeholder="选择日期"
                 :picker-options="pickerOptionsDay">
                 </el-date-picker>
@@ -33,6 +35,7 @@
                 <el-date-picker
                 v-model="someTime"
                 type="datetimerange"
+                clearable
                 :picker-options="pickerOptionsTime"
                 range-separator="至"
                 start-placeholder="开始日期"
@@ -42,9 +45,20 @@
                 <el-button @click="querySomeTimeUsers">查询</el-button>
                 <span class="demonstration">某段时间</span> 
             </div>
-                        
+            <div>
+                
+            </div>
+            <!-- <div class="query-video-name">
+                <el-input
+                placeholder="请输入内容"
+                v-model="videoName"
+                clearable>
+                </el-input>
+                <el-button @click="queryTimePointUsers">查询</el-button>
+                <span class="demonstration">大于某个时间点播放</span>
+            </div>        -->
         </div>
-            <!-- <div>{{testdate}}</div> -->
+
         <div class="table-container">
             <!-- 表格信息开始 -->
              <el-table
@@ -106,7 +120,7 @@
             <!-- 表格信息结束 -->
 
            <!-- 分页开始 -->
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
@@ -115,7 +129,7 @@
                     layout="total, prev, pager, next, jumper"
                     :total="count">
                 </el-pagination>
-            </div>
+            </div> -->
             <!-- 分页结束 -->
             
   
@@ -129,10 +143,11 @@
     import headTop from '../components/headTop'
     import dtime from 'time-formater'
     import {baseUrl, baseImgPath} from '@/config/env'
-    import {getToDayUsers, getTimePointUsers, getOneDayUsers, getSomeTimeUsers} from '@/api/getData'
+    import {getToDayUsers, getTimePointUsers, getOneDayUsers, getSomeTimeUsers, getNowPlayUsers} from '@/api/getData'
     export default {
         data(){
             return {
+                isQuery: false,
                 infos: '',
                 tableData: [{
                     date: '2016-05-01',
@@ -198,7 +213,8 @@
                 timePoint: '',
                 oneDay: '',
                 someTime: '',
-              
+                videoName:'',
+                queryVideo: {},
 
                 // 分页
                 currentRow: null,
@@ -211,19 +227,43 @@
             }
         },
         created(){
-            this.initData();
+            if(this.isQuery == false){
+                this.initData();
+            }else{
+                this.clearMonitorUser();
+                this.isQuery = true;
+                this.queryVideo = this.$route.query;
+                // console.log(this.$route.query.videoId);
+                this.getVideoUsers();
+            }
+            
         },
         watch: {
             $route(to,from){
+                // console.log(to,from)
                 if(to.path === '/userMonitoring'){ 
-                    // console.log('enter'); 
-                    this.initData()
+                    if(from.path === '/videoMonitoring'){
+                        if(this.$route.query.videoId != undefined){
+                            this.clearMonitorUser();
+                            this.isQuery = true;
+                            this.queryVideo = this.$route.query;
+                            // console.log(this.$route.query.videoId);
+                            this.getVideoUsers();
+                        }else{
+                            // console.log(111);
+                            this.initData();
+                        }
+                    }else{
+                        this.initData()
+                    }
                 };
                 if(from.path === '/userMonitoring'){
                     // console.log('leave')
                     this.clearMonitorUser();
+                    this.isQuery = false;
                    
-                }
+                };
+                
                
         	}
         },
@@ -308,9 +348,30 @@
             enterView(index,row){
                 // console.log(index, row);
                 this.$router.push({
-                    path: 'userMonView',
-                    query: row
+                        path: 'userMonView',
+                        query: row
+                        // {
+                        //     row : row,
+                        //     queryVideo: this.queryVideo
+                        // }
                 });
+
+                // if(this.isQuery == false){
+                //     this.$router.push({
+                //         path: 'userMonView',
+                //         query: row,
+                //         queryVideo: this.queryVideo
+                //     });
+                // }else{
+                //     this.$router.push({
+                //         path: 'userMonView',
+                //         query: {
+                //             row: row,
+                //             queryVideo: this.queryVideo
+                //         }
+                //     });
+                // }
+                
                 
             },
             
@@ -398,9 +459,9 @@
                         startTime: dtime(this.someTime[0]).format('YYYY-MM-DD HH:mm:ss'),
                         endTime: dtime(this.someTime[1]).format('YYYY-MM-DD HH:mm:ss')
                     }
-                    console.log(params);
+                    // console.log(params);
                     const res = await getSomeTimeUsers(params);
-                    console.log(res);
+                    // console.log(res);
                     if(res.status == 200){
                         if(res.data.success == true){
                             this.tableData = [];
@@ -426,8 +487,48 @@
                     console.log(error);
                 }
             },
+
+            //获取某个时间正在观看某视频的用户
+            async getVideoUsers(){
+                try {
+                    this.clearMonitorUser();
+                    this.timePoint = this.queryVideo.nowTime;
+                    this.oneDay = this.queryVideo.today;
+                    const params = {
+                        today: this.queryVideo.today,
+                        nowTime: this.queryVideo.nowTime,
+                        videoId: this.queryVideo.videoId
+                    }
+                    const res = await getNowPlayUsers(params);
+                    // console.log(res);
+                    if(res.status == 200){
+                        if(res.data.success == true){
+                            this.tableData = [];
+                            res.data.playUsers.forEach(item => {
+                                const tableItem = {
+                                    date :  dtime(item.start_date).format('YYYY-MM-DD'),
+                                    userId : item.user_id,
+                                    userName : item.user_name,
+                                    videoId : item.video_id,
+                                    videoName : item.video_name,
+                                    videoUrl : item.video_url,
+                                    videoDuration: item.video_duration,
+                                    startTime : dtime(item.start_time).format('YYYY-MM-DD HH:mm:ss'),
+                                }
+                                this.tableData.push(tableItem);
+                            });
+                            // console.log(this.tableData)
+                        }else{
+                            console.log('获取数据失败')
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            },
             test(){
-            
+                this.getVideoUsers()
+                console.log(this.isQuery)
                 // console.log(dtime(this.timePoint).format('YYYY-MM-DD HH:mm:ss'));
                 // console.log(dtime(this.timePoint).format('YYYY-MM-DD HH:mm:ss'));
                 // console.log(dtime(this.oneDay).format('YYYY-MM-DD HH:mm:ss'));
@@ -499,5 +600,8 @@
         margin-right: 200px;
         float: right;
     }
-
+    .query-video-name{
+        width: 350px;
+        height: 36px;
+    }
 </style>

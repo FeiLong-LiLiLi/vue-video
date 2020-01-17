@@ -117,7 +117,7 @@
 				// console.log(params)
 				try {
 					const res = await getTodayLoginCount(params);
-					console.log(res);
+					// console.log(res);
 					if(res.status == 200){
 						if(res.data.success == true){
 							this.loginCount = res.data.amount;

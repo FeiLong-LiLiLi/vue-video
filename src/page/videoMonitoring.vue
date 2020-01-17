@@ -7,14 +7,15 @@
             <div>
                 <el-button @click="initData">实时监控</el-button>
             </div>
-            <div class="block">
-                <span class="demonstration">大于某个时间点播放</span>
+            <div class="block">   
                 <el-date-picker
                 v-model="timePoint"
                 type="datetime"
+                clearable
                 placeholder="任意时间点">
                 </el-date-picker>
                 <el-button @click="queryTimePointVideos">查询</el-button>
+                <span class="demonstration">大于某个时间点播放</span>
             </div>
 
             <!-- <div class="block">
@@ -80,7 +81,7 @@
                     <span>{{ scope.row.userCount }}</span>
                 </template>
                 </el-table-column>
-                <!-- <el-table-column label="操作">
+                <el-table-column label="操作">
                 <template slot-scope="scope">   
                     <el-button 
                     size="small"
@@ -88,12 +89,12 @@
                     @click="enterView(scope.$index, scope.row)"
                     >进入查看</el-button> 
                   </template>
-                </el-table-column> -->
+                </el-table-column>
             </el-table>
             <!-- 表格信息结束 -->
 
            <!-- 分页开始 -->
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
@@ -102,7 +103,7 @@
                     layout="total, prev, pager, next, jumper"
                     :total="count">
                 </el-pagination>
-            </div>
+            </div> -->
             <!-- 分页结束 -->
             
   
@@ -128,55 +129,55 @@
                     nowPlayUsersCount: 10
                     }],
 
-                pickerOptionsDay: {
-                    shortcuts: [{
-                        text: '今天',
-                        onClick(picker) {
-                        picker.$emit('pick', new Date());
-                        }
-                    }, {
-                        text: '昨天',
-                        onClick(picker) {
-                        const date = new Date();
-                        date.setTime(date.getTime() - 3600 * 1000 * 24);
-                        picker.$emit('pick', date);
-                        }
-                    }, {
-                        text: '一周前',
-                        onClick(picker) {
-                        const date = new Date();
-                        date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-                        picker.$emit('pick', date);
-                        }
-                    }]
-                },
-                pickerOptionsTime: {
-                    shortcuts: [{
-                        text: '最近一周',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近一个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近三个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }]
-                },
+                // pickerOptionsDay: {
+                //     shortcuts: [{
+                //         text: '今天',
+                //         onClick(picker) {
+                //         picker.$emit('pick', new Date());
+                //         }
+                //     }, {
+                //         text: '昨天',
+                //         onClick(picker) {
+                //         const date = new Date();
+                //         date.setTime(date.getTime() - 3600 * 1000 * 24);
+                //         picker.$emit('pick', date);
+                //         }
+                //     }, {
+                //         text: '一周前',
+                //         onClick(picker) {
+                //         const date = new Date();
+                //         date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                //         picker.$emit('pick', date);
+                //         }
+                //     }]
+                // },
+                // pickerOptionsTime: {
+                //     shortcuts: [{
+                //         text: '最近一周',
+                //         onClick(picker) {
+                //             const end = new Date();
+                //             const start = new Date();
+                //             start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                //             picker.$emit('pick', [start, end]);
+                //         }
+                //     }, {
+                //         text: '最近一个月',
+                //         onClick(picker) {
+                //             const end = new Date();
+                //             const start = new Date();
+                //             start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                //             picker.$emit('pick', [start, end]);
+                //         }
+                //     }, {
+                //         text: '最近三个月',
+                //         onClick(picker) {
+                //             const end = new Date();
+                //             const start = new Date();
+                //             start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                //             picker.$emit('pick', [start, end]);
+                //         }
+                //     }]
+                // },
                 timePoint: '',
                 oneDay: '',
                 someTime: '',
@@ -239,8 +240,8 @@
             //获取监控数据
             async initVideosData(){
                 try {
-                    const timePoint = dtime(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
-                    const oneMinsAgeTime = this.getOneAgeTime(timePoint);
+                    this.timePoint = dtime(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
+                    const oneMinsAgeTime = this.getOneAgeTime(this.timePoint);
                     const params = {oneMinsAgeTime:oneMinsAgeTime};
                     const res = await getNowPlayVideo(params);
                     // console.log(res)
@@ -249,7 +250,7 @@
                             this.tableData = [];
                             res.data.nowPlayVideos.forEach(item => {
                                 const tableItem = {
-                                    videoId: item.videoId,
+                                    videoId: item.video_id,
                                     videoName: item.video_name,
                                     videoUrl: item.video_url,
                                     userCount: item.userCount
@@ -285,11 +286,19 @@
                 }
             },
 
-            enterView(index,row){
-                // console.log(index, row);
+            enterView(index, row){
+                const today = dtime(this.timePoint).format('YYYY-MM-DD');
+                const nowTime = this.getOneAgeTime(this.timePoint);
+                const data = {
+                    videoId: row.videoId,
+                    videoName: row.videoName,
+                    today: today,
+                    nowTime:nowTime
+                }
+                // console.log(index, data);
                 this.$router.push({
-                    path: 'userMonView',
-                    query: row
+                    path: 'userMonitoring',
+                    query: data
                 });
                 
             },
@@ -315,7 +324,7 @@
                             this.tableData = [];
                             res.data.nowPlayVideos.forEach(item => {
                                 const tableItem = {
-                                    videoId: item.videoId,
+                                    videoId: item.video_id,
                                     videoName: item.video_name,
                                     videoUrl: item.video_url,
                                     userCount: item.userCount
