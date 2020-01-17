@@ -79,7 +79,6 @@
 						if(res.status == 200){
 							if(res.data.success == true){
 								this.initSevenDay();
-								
 								const data = res.data.session.user;
 								// console.log(data);
 								this.setCookie(data.name,data.admin_id,data.psw,res.data.sessionID,1)
@@ -127,15 +126,15 @@
             },
 
 			//初始化数据
-			async initSevenDay(){
-				this.sevenDay = [];
-				for (let i = 6; i > -1; i--) {
-					const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
-					this.sevenDay.push(date);
-					console.log(date);
-					// console.log(this.sevenDay);
-					try {	
-						const params = {today : date}
+			async initSevenDay(){				
+				try {
+					this.sevenDay = [];
+					for (let i = 6; i > -1; i--) {
+						const date = dtime(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
+						this.sevenDay.push(date);
+					}
+					for(var i = 0; i < 7; i++){
+						const params = {today : this.sevenDay[i]}
 						// console.log(params);
 						const init = await initSevenData(params);
 						if(init.status == 200){
@@ -145,21 +144,21 @@
 									message: init.data.msg,
 									type: 'error'
 								});
+							}else{
+								setTimeout(()=>{this.$router.push('manage');},1000)
 							}
-							// this.$router.push('manage');
 						}else{
 							this.$message({
 								showClose: true,
 								message: '初始化数据失败',
 								type: 'error'
 							});
-							// this.$router.push('manage');
 						}
-
-					}catch (error) {
-						console.log(error);
-					}
+					}	
+				}catch (error) {
+					console.log(error);
 				}
+				
 			},
 		},
 		
